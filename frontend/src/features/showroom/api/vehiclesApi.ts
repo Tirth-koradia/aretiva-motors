@@ -43,3 +43,50 @@ export async function getVehicles(session: LoginResult): Promise<VehiclePage> {
 
   return (await response.json()) as VehiclePage
 }
+
+export type StockActionResult = {
+  transaction_id: string
+  vehicle_id: string
+  quantity_remaining: number
+}
+
+export async function getVehicle(
+  session: LoginResult,
+  vehicleId: string,
+): Promise<Vehicle> {
+  const response = await fetch(`${apiBaseUrl}/vehicles/${vehicleId}`, {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  })
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as {
+      error?: { message?: string }
+    } | null
+    throw new Error(
+      payload?.error?.message ?? 'This vehicle could not be loaded.',
+    )
+  }
+
+  return (await response.json()) as Vehicle
+}
+
+export async function purchaseVehicle(
+  session: LoginResult,
+  vehicleId: string,
+): Promise<StockActionResult> {
+  const response = await fetch(`${apiBaseUrl}/vehicles/${vehicleId}/purchase`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  })
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as {
+      error?: { message?: string }
+    } | null
+    throw new Error(
+      payload?.error?.message ?? 'This purchase could not be recorded.',
+    )
+  }
+
+  return (await response.json()) as StockActionResult
+}

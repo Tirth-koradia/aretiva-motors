@@ -73,8 +73,8 @@ describe('vehicle detail page', () => {
       screen.getByRole('button', { name: 'Record purchase request' }),
     )
 
-    expect(
-      await screen.findByText('Purchase request recorded.'),
-    ).toBeInTheDocument()
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Purchase request recorded.',
+    )
   })
 })
