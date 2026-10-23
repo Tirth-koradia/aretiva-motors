@@ -53,3 +53,11 @@ class VehicleNotFoundError(AppError):
     status_code = status.HTTP_404_NOT_FOUND
     code = "VEHICLE_NOT_FOUND"
     message = "The requested vehicle could not be found."
+
+
+class VehicleOutOfStockError(AppError):
+    """Raised when a purchase cannot reserve the final available unit."""
+
+    status_code = status.HTTP_409_CONFLICT
+    code = "VEHICLE_OUT_OF_STOCK"
+    message = "This vehicle is no longer available for purchase."

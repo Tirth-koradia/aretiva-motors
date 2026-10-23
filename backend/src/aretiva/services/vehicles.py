@@ -4,9 +4,14 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import UUID
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aretiva.core.exceptions import VehicleNotFoundError, VehicleOutOfStockError
+from aretiva.db.models.inventory_transaction import (
+    InventoryTransaction,
+    InventoryTransactionType,
+)
 from aretiva.db.models.vehicle import Vehicle
 from aretiva.schemas.vehicle import VehicleCreateRequest, VehicleSort
 
@@ -67,6 +72,85 @@ async def soft_delete_vehicle(session: AsyncSession, vehicle: Vehicle) -> None:
     """Retain an audit-friendly record while hiding it from active inventory."""
     vehicle.deleted_at = datetime.now(UTC)
     await session.commit()
+
+
+async def purchase_vehicle(
+    session: AsyncSession,
+    *,
+    vehicle_id: UUID,
+    customer_id: UUID,
+) -> InventoryTransaction:
+    """Atomically reserve exactly one available vehicle and write its ledger entry."""
+    try:
+        result = await session.execute(
+            update(Vehicle)
+            .where(
+                Vehicle.id == vehicle_id,
+                Vehicle.deleted_at.is_(None),
+                Vehicle.quantity >= 1,
+            )
+            .values(quantity=Vehicle.quantity - 1)
+            .returning(Vehicle.quantity)
+        )
+        quantity_after = result.scalar_one_or_none()
+        if quantity_after is None:
+            await session.rollback()
+            if await get_active_vehicle(session, vehicle_id) is None:
+                raise VehicleNotFoundError
+            raise VehicleOutOfStockError
+
+        transaction = InventoryTransaction(
+            vehicle_id=vehicle_id,
+            user_id=customer_id,
+            transaction_type=InventoryTransactionType.PURCHASE,
+            quantity_delta=-1,
+            quantity_before=quantity_after + 1,
+            quantity_after=quantity_after,
+        )
+        session.add(transaction)
+        await session.flush()
+        await session.commit()
+        return transaction
+    except Exception:
+        await session.rollback()
+        raise
+
+
+async def restock_vehicle(
+    session: AsyncSession,
+    *,
+    vehicle_id: UUID,
+    administrator_id: UUID,
+    quantity: int,
+) -> InventoryTransaction:
+    """Atomically add stock and append the corresponding administrator ledger entry."""
+    try:
+        result = await session.execute(
+            update(Vehicle)
+            .where(Vehicle.id == vehicle_id, Vehicle.deleted_at.is_(None))
+            .values(quantity=Vehicle.quantity + quantity)
+            .returning(Vehicle.quantity)
+        )
+        quantity_after = result.scalar_one_or_none()
+        if quantity_after is None:
+            await session.rollback()
+            raise VehicleNotFoundError
+
+        transaction = InventoryTransaction(
+            vehicle_id=vehicle_id,
+            user_id=administrator_id,
+            transaction_type=InventoryTransactionType.RESTOCK,
+            quantity_delta=quantity,
+            quantity_before=quantity_after - quantity,
+            quantity_after=quantity_after,
+        )
+        session.add(transaction)
+        await session.flush()
+        await session.commit()
+        return transaction
+    except Exception:
+        await session.rollback()
+        raise
 
 
 async def search_active_vehicles(

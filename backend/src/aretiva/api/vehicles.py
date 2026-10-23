@@ -13,6 +13,8 @@ from aretiva.db.models.user import User, UserRole
 from aretiva.db.session import get_session
 from aretiva.schemas.vehicle import (
     PaginationMeta,
+    RestockRequest,
+    StockActionResponse,
     VehicleCategory,
     VehicleCreateRequest,
     VehiclePage,
@@ -23,12 +25,56 @@ from aretiva.services.vehicles import (
     create_vehicle,
     get_active_vehicle,
     list_active_vehicles,
+    purchase_vehicle,
+    restock_vehicle,
     search_active_vehicles,
     soft_delete_vehicle,
     update_vehicle,
 )
 
 router = APIRouter(prefix="/vehicles", tags=["vehicles"])
+
+
+@router.post(
+    "/{vehicle_id}/purchase",
+    response_model=StockActionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def purchase(
+    vehicle_id: UUID,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(require_role(UserRole.CUSTOMER))],
+) -> StockActionResponse:
+    """Purchase one available unit; customer access is required."""
+    transaction = await purchase_vehicle(
+        session, vehicle_id=vehicle_id, customer_id=current_user.id
+    )
+    return StockActionResponse(
+        transaction_id=transaction.id,
+        vehicle_id=transaction.vehicle_id,
+        quantity_remaining=transaction.quantity_after,
+    )
+
+
+@router.post("/{vehicle_id}/restock", response_model=StockActionResponse)
+async def restock(
+    vehicle_id: UUID,
+    restock_data: RestockRequest,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(require_role(UserRole.ADMIN))],
+) -> StockActionResponse:
+    """Add stock to one active vehicle; administrator access is required."""
+    transaction = await restock_vehicle(
+        session,
+        vehicle_id=vehicle_id,
+        administrator_id=current_user.id,
+        quantity=restock_data.quantity,
+    )
+    return StockActionResponse(
+        transaction_id=transaction.id,
+        vehicle_id=transaction.vehicle_id,
+        quantity_remaining=transaction.quantity_after,
+    )
 
 
 @router.get("", response_model=VehiclePage)

@@ -88,3 +88,19 @@ class VehiclePage(BaseModel):
 
     items: list[VehicleResponse]
     meta: PaginationMeta
+
+
+class RestockRequest(BaseModel):
+    """The positive quantity an administrator adds to one vehicle."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    quantity: int = Field(ge=1, le=1000)
+
+
+class StockActionResponse(BaseModel):
+    """Confirmation returned after an atomic purchase or restock."""
+
+    transaction_id: UUID
+    vehicle_id: UUID
+    quantity_remaining: int
