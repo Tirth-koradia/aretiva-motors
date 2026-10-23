@@ -1,0 +1,85 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-canvas: #f6f2e9;
+  --color-brand: #1f665e;
+  --color-accent: #b8613b;
+  --color-mist: #dde9e3;
+  --color-ink: #19312d;
+  --font-display: 'Iowan Old Style', 'Baskerville', 'Times New Roman', serif;
+  --font-sans: 'Avenir Next', 'Segoe UI', sans-serif;
+}
+
+:root {
+  color-scheme: light;
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  --surface-canvas: #f6f2e9;
+  --action-primary: #1f665e;
+  --accent-gallery: #b8613b;
+  --surface-soft: #dde9e3;
+  --text-primary: #19312d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--surface-canvas);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--surface-canvas);
+  color: var(--text-primary);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-gallery);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--surface-soft);
+  color: var(--text-primary);
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 50;
+  transform: translateY(-200%);
+  border-radius: 0.25rem;
+  background: var(--action-primary);
+  color: var(--surface-canvas);
+  padding: 0.75rem 1rem;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
