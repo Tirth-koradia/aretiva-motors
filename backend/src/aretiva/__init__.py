@@ -1,2 +1,1 @@
 """Aretiva Motors API package."""
-
