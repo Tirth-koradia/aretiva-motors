@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { readSession } from '../../auth/session'
@@ -93,9 +94,16 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
 
 export function ShowroomPage() {
   const session = readSession()
+  const [filters, setFilters] = useState({
+    query: '',
+    category: '',
+    inStock: false,
+    sort: 'newest' as const,
+    page: 1,
+  })
   const vehiclesQuery = useQuery({
-    queryKey: ['vehicles', 'showroom'],
-    queryFn: () => getVehicles(session!),
+    queryKey: ['vehicles', 'showroom', filters],
+    queryFn: () => getVehicles(session!, filters),
     enabled: session !== null,
   })
 
@@ -134,12 +142,21 @@ export function ShowroomPage() {
             Aretiva Motors
           </Link>
           <div className="flex items-center gap-5 text-sm">
-            <Link
-              className="text-ink/65 underline underline-offset-4"
-              to="/purchases"
-            >
-              Your considerations
-            </Link>
+            {session.user.role === 'admin' ? (
+              <Link
+                className="text-ink/65 underline underline-offset-4"
+                to="/admin/inventory"
+              >
+                Inventory desk
+              </Link>
+            ) : (
+              <Link
+                className="text-ink/65 underline underline-offset-4"
+                to="/purchases"
+              >
+                Your considerations
+              </Link>
+            )}
             <p className="text-ink/65">{session.user.full_name}</p>
           </div>
         </div>
@@ -160,6 +177,95 @@ export function ShowroomPage() {
           </p>
         </div>
 
+        <form
+          className="border-ink/15 mt-8 grid gap-4 border-b pb-8 md:grid-cols-[1.5fr_1fr_1fr_auto] md:items-end"
+          onSubmit={(event) => {
+            event.preventDefault()
+            setFilters((current) => ({ ...current, page: 1 }))
+          }}
+        >
+          <label className="grid gap-2 text-sm font-semibold">
+            Search the collection
+            <input
+              className="border-ink/20 focus:border-brand focus:ring-brand/20 bg-white px-3 py-3 font-normal outline-none focus:ring-2"
+              onChange={(event) =>
+                setFilters((current) => ({
+                  ...current,
+                  query: event.target.value,
+                }))
+              }
+              placeholder="Make, model, or detail"
+              type="search"
+              value={filters.query}
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-semibold">
+            Body style
+            <select
+              className="border-ink/20 focus:border-brand focus:ring-brand/20 bg-white px-3 py-3 font-normal outline-none focus:ring-2"
+              onChange={(event) =>
+                setFilters((current) => ({
+                  ...current,
+                  category: event.target.value,
+                  page: 1,
+                }))
+              }
+              value={filters.category}
+            >
+              <option value="">All styles</option>
+              <option value="sedan">Sedan</option>
+              <option value="suv">SUV</option>
+              <option value="hatchback">Hatchback</option>
+              <option value="coupe">Coupe</option>
+              <option value="convertible">Convertible</option>
+              <option value="truck">Truck</option>
+              <option value="van">Van</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <label className="grid gap-2 text-sm font-semibold">
+            Arrange by
+            <select
+              className="border-ink/20 focus:border-brand focus:ring-brand/20 bg-white px-3 py-3 font-normal outline-none focus:ring-2"
+              onChange={(event) =>
+                setFilters((current) => ({
+                  ...current,
+                  sort: event.target.value as typeof current.sort,
+                  page: 1,
+                }))
+              }
+              value={filters.sort}
+            >
+              <option value="newest">Most recently added</option>
+              <option value="price_asc">Price: low to high</option>
+              <option value="price_desc">Price: high to low</option>
+              <option value="year_desc">Newest model year</option>
+            </select>
+          </label>
+          <div className="flex gap-3">
+            <label className="border-ink/20 flex min-h-12 items-center gap-2 border bg-white px-3 text-sm">
+              <input
+                checked={filters.inStock}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    inStock: event.target.checked,
+                    page: 1,
+                  }))
+                }
+                type="checkbox"
+              />
+              Available now
+            </label>
+            <button
+              className="bg-brand text-canvas min-h-12 px-5 text-sm font-semibold"
+              type="submit"
+            >
+              Refine
+            </button>
+          </div>
+        </form>
+
         {vehiclesQuery.isPending ? (
           <p className="text-ink/65 mt-12">Preparing the collection…</p>
         ) : null}
@@ -177,14 +283,58 @@ export function ShowroomPage() {
           </p>
         ) : null}
         {vehiclesQuery.data ? (
-          <section
-            aria-label="Vehicle collection"
-            className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3"
-          >
-            {vehiclesQuery.data.items.map((vehicle) => (
-              <VehicleCard key={vehicle.id} vehicle={vehicle} />
-            ))}
-          </section>
+          <>
+            <section
+              aria-label="Vehicle collection"
+              className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3"
+            >
+              {vehiclesQuery.data.items.map((vehicle) => (
+                <VehicleCard key={vehicle.id} vehicle={vehicle} />
+              ))}
+            </section>
+            {vehiclesQuery.data.meta.total_pages > 1 ? (
+              <nav
+                aria-label="Collection pages"
+                className="border-ink/15 mt-10 flex items-center justify-between border-t pt-6"
+              >
+                <p className="text-ink/65 text-sm">
+                  Page {vehiclesQuery.data.meta.page} of{' '}
+                  {vehiclesQuery.data.meta.total_pages} ·{' '}
+                  {vehiclesQuery.data.meta.total} vehicles
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    className="border-ink/25 min-h-10 border px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                    disabled={filters.page === 1}
+                    onClick={() =>
+                      setFilters((current) => ({
+                        ...current,
+                        page: current.page - 1,
+                      }))
+                    }
+                    type="button"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    className="bg-brand text-canvas min-h-10 px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                    disabled={
+                      filters.page >= vehiclesQuery.data.meta.total_pages
+                    }
+                    onClick={() =>
+                      setFilters((current) => ({
+                        ...current,
+                        page: current.page + 1,
+                      }))
+                    }
+                    type="button"
+                  >
+                    Next
+                  </button>
+                </div>
+              </nav>
+            ) : null}
+          </>
         ) : null}
       </main>
     </div>

@@ -25,10 +25,39 @@ export type VehiclePage = {
   meta: { page: number; page_size: number; total: number; total_pages: number }
 }
 
+export type VehicleSearchFilters = {
+  query?: string
+  category?: string
+  inStock?: boolean
+  sort?: 'newest' | 'price_asc' | 'price_desc' | 'year_desc'
+  page?: number
+}
+
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 
-export async function getVehicles(session: LoginResult): Promise<VehiclePage> {
-  const response = await fetch(`${apiBaseUrl}/vehicles?page=1&page_size=12`, {
+export async function getVehicles(
+  session: LoginResult,
+  filters: VehicleSearchFilters = {},
+): Promise<VehiclePage> {
+  const usesSearch = Boolean(
+    filters.query ||
+    filters.category ||
+    filters.inStock ||
+    (filters.sort && filters.sort !== 'newest'),
+  )
+  const params = new URLSearchParams({
+    page: String(filters.page ?? 1),
+    page_size: '12',
+  })
+
+  if (filters.query) params.set('query', filters.query)
+  if (filters.category) params.set('category', filters.category)
+  if (filters.inStock) params.set('in_stock', 'true')
+  if (filters.sort && filters.sort !== 'newest')
+    params.set('sort', filters.sort)
+
+  const endpoint = usesSearch ? '/vehicles/search' : '/vehicles'
+  const response = await fetch(`${apiBaseUrl}${endpoint}?${params}`, {
     headers: { Authorization: `Bearer ${session.access_token}` },
   })
 
