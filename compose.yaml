@@ -1,0 +1,22 @@
+name: aretiva-motors
+
+services:
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-aretiva}
+      POSTGRES_USER: ${POSTGRES_USER:-aretiva}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aretiva_dev}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aretiva} -d ${POSTGRES_DB:-aretiva}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
+
