@@ -11,6 +11,7 @@ VehicleCondition = Literal["new", "pre_owned"]
 VehicleCategory = Literal["sedan", "suv", "hatchback", "coupe", "convertible", "truck", "van"]
 FuelType = Literal["petrol", "diesel", "hybrid", "electric"]
 Transmission = Literal["manual", "automatic"]
+VehicleSort = Literal["newest", "price_asc", "price_desc", "year_desc"]
 Money = Annotated[Decimal, Field(gt=Decimal("0"), max_digits=12, decimal_places=2)]
 
 
