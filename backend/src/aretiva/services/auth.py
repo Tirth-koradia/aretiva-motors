@@ -1,5 +1,6 @@
 """Authentication use cases."""
 
+from pydantic import SecretStr
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -53,3 +54,39 @@ async def login_user(
     """Authenticate a user and issue a signed bearer token."""
     user = await authenticate_user(session, credentials)
     return user, create_access_token(user, settings)
+
+
+async def ensure_administrator(
+    session: AsyncSession,
+    *,
+    full_name: str,
+    email: str,
+    password: SecretStr,
+) -> tuple[User, bool]:
+    """Create the first administrator once, or safely preserve an existing one."""
+    normalized_email = email.strip().lower()
+    user = await session.scalar(select(User).where(User.email == normalized_email))
+    if user is not None:
+        if user.role != UserRole.ADMIN:
+            user.role = UserRole.ADMIN
+            await session.commit()
+            await session.refresh(user)
+        return user, False
+
+    user = User(
+        full_name=" ".join(full_name.split()),
+        email=normalized_email,
+        password_hash=await hash_password(password.get_secret_value()),
+        role=UserRole.ADMIN,
+    )
+    session.add(user)
+    try:
+        await session.commit()
+    except IntegrityError:
+        await session.rollback()
+        existing_user = await session.scalar(select(User).where(User.email == normalized_email))
+        if existing_user is None:
+            raise
+        return existing_user, False
+    await session.refresh(user)
+    return user, True

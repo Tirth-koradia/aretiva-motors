@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     jwt_audience: str = "aretiva-motors-web"
     access_token_expire_minutes: int = 30
     cors_origins: str = "http://localhost:5173"
+    admin_email: str | None = None
+    admin_password: SecretStr | None = None
 
 
 @lru_cache

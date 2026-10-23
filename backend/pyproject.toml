@@ -21,6 +21,9 @@ dependencies = [
   "uvicorn[standard]==0.53.0",
 ]
 
+[project.scripts]
+aretiva-admin = "aretiva.cli:main"
+
 [project.optional-dependencies]
 dev = [
   "httpx==0.28.1",
