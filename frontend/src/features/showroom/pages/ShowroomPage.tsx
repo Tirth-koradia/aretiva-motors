@@ -133,7 +133,15 @@ export function ShowroomPage() {
           >
             Aretiva Motors
           </Link>
-          <p className="text-ink/65 text-sm">{session.user.full_name}</p>
+          <div className="flex items-center gap-5 text-sm">
+            <Link
+              className="text-ink/65 underline underline-offset-4"
+              to="/purchases"
+            >
+              Your considerations
+            </Link>
+            <p className="text-ink/65">{session.user.full_name}</p>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10 lg:py-16">

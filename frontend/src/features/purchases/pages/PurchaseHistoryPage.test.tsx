@@ -51,7 +51,7 @@ describe('purchase history page', () => {
     expect(
       await screen.findByRole('heading', { name: 'Your considerations.' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Honda City ZX')).toBeInTheDocument()
+    expect(await screen.findByText('Honda City ZX')).toBeInTheDocument()
     expect(screen.getByText('₹14,89,000')).toBeInTheDocument()
   })
 })
