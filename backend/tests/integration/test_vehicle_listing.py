@@ -80,6 +80,6 @@ def test_inventory_listing_requires_an_authenticated_user(client: TestClient) ->
     assert response.json() == {
         "error": {
             "code": "UNAUTHENTICATED",
-            "message": "Authentication is required to access this resource.",
+            "message": "A valid access token is required.",
         }
     }

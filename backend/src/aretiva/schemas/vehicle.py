@@ -71,3 +71,19 @@ class VehicleResponse(BaseModel):
     deleted_at: datetime | None
     created_at: datetime
     updated_at: datetime
+
+
+class PaginationMeta(BaseModel):
+    """Server-calculated pagination details for a collection response."""
+
+    page: int
+    page_size: int
+    total: int
+    total_pages: int
+
+
+class VehiclePage(BaseModel):
+    """A page of active showroom inventory."""
+
+    items: list[VehicleResponse]
+    meta: PaginationMeta

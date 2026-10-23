@@ -1,5 +1,6 @@
 """Vehicle inventory use cases."""
 
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aretiva.db.models.vehicle import Vehicle
@@ -13,3 +14,25 @@ async def create_vehicle(session: AsyncSession, vehicle_data: VehicleCreateReque
     await session.commit()
     await session.refresh(vehicle)
     return vehicle
+
+
+async def list_active_vehicles(
+    session: AsyncSession,
+    *,
+    page: int,
+    page_size: int,
+) -> tuple[list[Vehicle], int]:
+    """Return a stable page of vehicles that remain available in the showroom."""
+    active_vehicles = Vehicle.deleted_at.is_(None)
+    total_result = await session.execute(
+        select(func.count()).select_from(Vehicle).where(active_vehicles)
+    )
+    total = total_result.scalar_one()
+    vehicles_result = await session.execute(
+        select(Vehicle)
+        .where(active_vehicles)
+        .order_by(Vehicle.created_at.desc(), Vehicle.id.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    )
+    return list(vehicles_result.scalars().all()), total
