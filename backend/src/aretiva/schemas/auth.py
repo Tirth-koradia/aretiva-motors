@@ -40,3 +40,37 @@ class UserResponse(BaseModel):
     email: EmailStr
     role: UserRole
     created_at: datetime
+
+
+class LoginRequest(BaseModel):
+    """Credentials accepted by the login endpoint."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    email: EmailStr
+    password: str = Field(min_length=1, max_length=128)
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, value: EmailStr) -> str:
+        """Normalize credentials before lookup."""
+        return str(value).strip().casefold()
+
+
+class AuthenticatedUserResponse(BaseModel):
+    """Safe user profile bundled with a login response."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    full_name: str
+    email: EmailStr
+    role: UserRole
+
+
+class LoginResponse(BaseModel):
+    """Bearer access token and safe current-user details."""
+
+    access_token: str
+    token_type: str = "bearer"
+    user: AuthenticatedUserResponse

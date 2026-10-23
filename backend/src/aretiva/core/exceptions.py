@@ -17,3 +17,11 @@ class EmailAlreadyRegisteredError(AppError):
     status_code = status.HTTP_409_CONFLICT
     code = "EMAIL_ALREADY_REGISTERED"
     message = "An account with this email already exists."
+
+
+class InvalidCredentialsError(AppError):
+    """Raised when supplied credentials cannot authenticate a user."""
+
+    status_code = status.HTTP_401_UNAUTHORIZED
+    code = "INVALID_CREDENTIALS"
+    message = "Email or password is incorrect."

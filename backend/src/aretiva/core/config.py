@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     environment: Literal["development", "test", "production"] = "development"
     database_url: str = "postgresql+psycopg://aretiva:aretiva_dev@localhost:55432/aretiva"
     jwt_secret: SecretStr = SecretStr("development-only-secret-change-before-deploying")
+    jwt_algorithm: str = "HS256"
+    jwt_issuer: str = "aretiva-motors-api"
+    jwt_audience: str = "aretiva-motors-web"
     access_token_expire_minutes: int = 30
     cors_origins: str = "http://localhost:5173"
 
