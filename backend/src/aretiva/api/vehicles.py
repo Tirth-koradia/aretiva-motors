@@ -2,11 +2,13 @@
 
 from decimal import Decimal
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aretiva.api.deps import get_current_user, require_role
+from aretiva.core.exceptions import VehicleNotFoundError
 from aretiva.db.models.user import User, UserRole
 from aretiva.db.session import get_session
 from aretiva.schemas.vehicle import (
@@ -19,6 +21,7 @@ from aretiva.schemas.vehicle import (
 )
 from aretiva.services.vehicles import (
     create_vehicle,
+    get_active_vehicle,
     list_active_vehicles,
     search_active_vehicles,
 )
@@ -86,6 +89,19 @@ async def search_vehicles(
             total_pages=(total + page_size - 1) // page_size,
         ),
     )
+
+
+@router.get("/{vehicle_id}", response_model=VehicleResponse)
+async def get_vehicle(
+    vehicle_id: UUID,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    _: Annotated[User, Depends(get_current_user)],
+) -> VehicleResponse:
+    """Return one active vehicle for the authenticated showroom detail view."""
+    vehicle = await get_active_vehicle(session, vehicle_id)
+    if vehicle is None:
+        raise VehicleNotFoundError
+    return VehicleResponse.model_validate(vehicle)
 
 
 @router.post("", response_model=VehicleResponse, status_code=status.HTTP_201_CREATED)

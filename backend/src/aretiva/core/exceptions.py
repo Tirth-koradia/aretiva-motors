@@ -45,3 +45,11 @@ class ForbiddenError(AppError):
     status_code = status.HTTP_403_FORBIDDEN
     code = "FORBIDDEN"
     message = "You do not have permission to perform this action."
+
+
+class VehicleNotFoundError(AppError):
+    """Raised when an active vehicle cannot be found by its public ID."""
+
+    status_code = status.HTTP_404_NOT_FOUND
+    code = "VEHICLE_NOT_FOUND"
+    message = "The requested vehicle could not be found."

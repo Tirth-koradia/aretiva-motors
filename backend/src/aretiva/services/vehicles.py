@@ -1,6 +1,7 @@
 """Vehicle inventory use cases."""
 
 from decimal import Decimal
+from uuid import UUID
 
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,6 +39,14 @@ async def list_active_vehicles(
         .limit(page_size)
     )
     return list(vehicles_result.scalars().all()), total
+
+
+async def get_active_vehicle(session: AsyncSession, vehicle_id: UUID) -> Vehicle | None:
+    """Return one active vehicle or nothing when it is unavailable to the showroom."""
+    result = await session.execute(
+        select(Vehicle).where(Vehicle.id == vehicle_id, Vehicle.deleted_at.is_(None))
+    )
+    return result.scalar_one_or_none()
 
 
 async def search_active_vehicles(
