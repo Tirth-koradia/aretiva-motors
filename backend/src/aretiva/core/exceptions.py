@@ -37,3 +37,11 @@ class UnauthenticatedError(AppError):
     code = "UNAUTHENTICATED"
     message = "A valid access token is required."
     headers = {"WWW-Authenticate": "Bearer"}
+
+
+class ForbiddenError(AppError):
+    """Raised when an authenticated user lacks permission for an operation."""
+
+    status_code = status.HTTP_403_FORBIDDEN
+    code = "FORBIDDEN"
+    message = "You do not have permission to perform this action."

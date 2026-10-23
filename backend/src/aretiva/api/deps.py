@@ -1,5 +1,6 @@
 """Shared authorization dependencies."""
 
+from collections.abc import Callable
 from typing import Annotated
 from uuid import UUID
 
@@ -8,8 +9,8 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError, decode
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aretiva.core.exceptions import UnauthenticatedError
-from aretiva.db.models.user import User
+from aretiva.core.exceptions import ForbiddenError, UnauthenticatedError
+from aretiva.db.models.user import User, UserRole
 from aretiva.db.session import get_session
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -45,3 +46,16 @@ async def get_current_user(
         raise UnauthenticatedError
 
     return user
+
+
+def require_role(required_role: UserRole) -> Callable[[User], User]:
+    """Build a dependency that enforces a specific server-side user role."""
+
+    async def enforce_role(
+        current_user: Annotated[User, Depends(get_current_user)],
+    ) -> User:
+        if current_user.role != required_role:
+            raise ForbiddenError
+        return current_user
+
+    return enforce_role
