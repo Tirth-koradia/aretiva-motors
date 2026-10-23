@@ -1,6 +1,6 @@
 # Test report
 
-This report will be updated after every completed vertical slice and finalized before submission.
+This report is maintained during development and will be finalized with CI and browser evidence before submission.
 
 ## Planned layers
 
@@ -21,5 +21,13 @@ This report will be updated after every completed vertical slice and finalized b
 
 ## Current result
 
-Project foundation in progress; executable results will be recorded once the first Red–Green cycle is complete.
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Backend integration suite | Pass | `16 passed` against isolated PostgreSQL (`aretiva_test`) |
+| Backend static checks | Pass | Ruff format and lint clean |
+| Frontend interaction suite | Pass | `4 passed` with Vitest + Testing Library |
+| Frontend static checks | Pass | TypeScript and ESLint clean |
+| Frontend production build | Pass | Vite production bundle built successfully |
+
+The backend suite currently emits a FastAPI/Starlette `TestClient` deprecation warning. It does not affect observed behaviour; migrate to `httpx.AsyncClient` with `ASGITransport` during a later test-harness refactor.
 

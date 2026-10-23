@@ -26,6 +26,18 @@ This document is intentionally maintained during development so another engineer
    - React + TypeScript + Vite + Tailwind v4 + React Router + TanStack Query
    - responsive landing page is visually checked at mobile and desktop widths
    - Vitest/RTL, ESLint, Prettier, TypeScript, and Vite production build pass
+6. Authentication and protected browser flows:
+   - `/login` calls the FastAPI login route, persists a browser session, and enters the showroom
+   - `/register` creates customer accounts only; administrator access is intentionally absent
+   - test setup includes a deterministic browser-storage implementation for the current Node/JSDOM environment
+7. Vehicle inventory and showroom APIs:
+   - PostgreSQL `vehicles` migration with realistic, validated fields and soft deletion
+   - admin-only create, full update, and soft delete
+   - authenticated paginated list, controlled search, and active-vehicle detail route
+   - `/api/vehicles/search` is declared before `/{vehicle_id}`
+8. Authenticated showroom frontend:
+   - bearer-authenticated catalogue cards with responsive Verdigris Gallery styling
+   - loading, empty, unauthenticated, and controlled error states
 
 ## Important decisions
 
@@ -81,8 +93,9 @@ npm run build
 
 ## Current tests
 
-- Backend: 5 passing tests against isolated `aretiva_test` PostgreSQL database.
-- Frontend: 1 passing Vitest/RTL landing-page test.
+- Backend: 16 passing integration tests against isolated `aretiva_test` PostgreSQL database.
+- Frontend: 4 passing Vitest/RTL interaction tests (landing, login, registration, showroom).
+- Current checks: Ruff format/lint, TypeScript, ESLint, frontend production build all pass.
 - The backend test client currently prints a FastAPI/Starlette `TestClient` deprecation warning; behaviour is correct, but replace it with `httpx.AsyncClient` + `ASGITransport` as a later test-harness refactor.
 
 ## Git/TDD discipline
@@ -102,19 +115,19 @@ Do not squash the history before submission. Do not place tokens, passwords, pri
 
 ## Immediate next work
 
-1. Add JWT decoding/current-user dependency and server-side role enforcement.
-2. Add secure idempotent administrator bootstrap command (environment-defined credentials, not public registration). Seed documented disposable demo accounts later.
-3. Build vehicle persistence migration/model with required fields and realistic extras: VIN, make, model, category, condition, year, mileage, fuel type, transmission, description, image URL, `NUMERIC` price, quantity, timestamps, soft deletion.
-4. Build admin vehicle CRUD and customer list/search pagination endpoints. Declare `/api/vehicles/search` before dynamic `/{vehicle_id}` routes.
-5. Implement atomic purchase and restock with transaction ledger; test concurrency against PostgreSQL.
-6. Build frontend auth pages/session handling, then showroom/list/detail/purchase/history/admin flows, using TDD in matching slices.
-7. Add CI, Dockerfiles, seed data, screenshots, deploy (Vercel frontend + Render backend/PostgreSQL), then finalize README, `PROMPTS.md`, and test report.
+1. Add secure, idempotent administrator bootstrap command (environment-defined credentials, not public registration). Seed documented disposable demo accounts later.
+2. Implement the transaction-ledger migration/model plus atomic one-unit purchase and administrator restock. Use a conditional PostgreSQL update and test concurrent purchases of the final unit.
+3. Add purchase history and the customer-facing vehicle-detail/purchase flow; add the matching real frontend vehicle-detail route.
+4. Add the administrator dashboard/table/form, backed by the existing server-enforced vehicle management endpoints.
+5. Extend showroom filter controls to use the search API and URL query parameters; add pagination controls.
+6. Add CI, Dockerfiles, screenshots, deploy (Vercel frontend + Render backend/PostgreSQL), then finalize README, raw `PROMPTS.md` evidence, and test report.
 
 ## Key files
 
 - Backend app factory: `backend/src/aretiva/main.py`
 - API routes: `backend/src/aretiva/api/`
 - Auth service: `backend/src/aretiva/services/auth.py`
+- Vehicle service: `backend/src/aretiva/services/vehicles.py`
 - Security/JWT: `backend/src/aretiva/core/security.py`
 - Settings: `backend/src/aretiva/core/config.py`
 - Migrations: `backend/alembic/versions/`
@@ -122,6 +135,8 @@ Do not squash the history before submission. Do not place tokens, passwords, pri
 - Frontend router: `frontend/src/app/router.tsx`
 - Brand tokens: `frontend/src/styles/index.css`
 - Landing page: `frontend/src/features/marketing/pages/LandingPage.tsx`
+- Auth pages/session: `frontend/src/features/auth/`
+- Showroom page/API client: `frontend/src/features/showroom/`
 
 ## Assessment constraints to re-check before submission
 
