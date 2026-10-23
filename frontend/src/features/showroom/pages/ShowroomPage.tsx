@@ -1,9 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-
+import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { readSession } from '../../auth/session'
-import { getVehicles, type Vehicle } from '../api/vehiclesApi'
+import { getVehicles, type Vehicle, type VehicleSearchFilters } from '../api/vehiclesApi'
 
 function formatPrice(price: string) {
   return new Intl.NumberFormat('en-IN', {
@@ -93,14 +92,46 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
 }
 
 export function ShowroomPage() {
-  const session = readSession()
-  const [filters, setFilters] = useState({
-    query: '',
-    category: '',
-    inStock: false,
-    sort: 'newest' as const,
-    page: 1,
-  })
+  const session = readSession();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  type ShowroomFilters = VehicleSearchFilters & {
+    sort?: VehicleSearchFilters['sort'];
+    page: number;
+    make: string;
+    min_price: number;
+    max_price: number;
+    min_year: number;
+    max_year: number;
+  };
+
+  const [filters, setFilters] = useState<ShowroomFilters>({
+    query: searchParams.get('query') ?? '',
+    category: searchParams.get('category') ?? '',
+    inStock: searchParams.get('inStock') === 'true',
+    sort: (searchParams.get('sort') as VehicleSearchFilters['sort']) ?? 'newest',
+    page: Number(searchParams.get('page') ?? 1),
+    make: searchParams.get('make') ?? '',
+    min_price: Number(searchParams.get('min_price') ?? 0),
+    max_price: Number(searchParams.get('max_price') ?? 0),
+    min_year: Number(searchParams.get('min_year') ?? 0),
+    max_year: Number(searchParams.get('max_year') ?? 0),
+  });
+
+  // Sync filter state to URL query parameters
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (filters.query) params.set('query', filters.query);
+    if (filters.category) params.set('category', filters.category);
+    if (filters.inStock) params.set('inStock', 'true');
+    if (filters.sort) params.set('sort', filters.sort);
+    if (filters.make) params.set('make', filters.make);
+    if (filters.min_price) params.set('min_price', String(filters.min_price));
+    if (filters.max_price) params.set('max_price', String(filters.max_price));
+    if (filters.min_year) params.set('min_year', String(filters.min_year));
+    if (filters.max_year) params.set('max_year', String(filters.max_year));
+    setSearchParams(params);
+  }, [filters]);
   const vehiclesQuery = useQuery({
     queryKey: ['vehicles', 'showroom', filters],
     queryFn: () => getVehicles(session!, filters),
@@ -181,6 +212,7 @@ export function ShowroomPage() {
           className="border-ink/15 mt-8 grid gap-4 border-b pb-8 md:grid-cols-[1.5fr_1fr_1fr_auto] md:items-end"
           onSubmit={(event) => {
             event.preventDefault()
+            // URL sync is handled by the useEffect; just reset to page 1
             setFilters((current) => ({ ...current, page: 1 }))
           }}
         >
@@ -232,7 +264,7 @@ export function ShowroomPage() {
                   ...current,
                   sort: event.target.value as typeof current.sort,
                   page: 1,
-                }))
+                }) as ShowroomFilters)
               }
               value={filters.sort}
             >
@@ -241,6 +273,84 @@ export function ShowroomPage() {
               <option value="price_desc">Price: high to low</option>
               <option value="year_desc">Newest model year</option>
             </select>
+          </label>
+          <label className="grid gap-2 text-sm font-semibold">
+            Make
+            <input
+              className="border-ink/20 focus:border-brand focus:ring-brand/20 bg-white px-3 py-3 font-normal outline-none focus:ring-2"
+              type="text"
+              placeholder="e.g., Toyota"
+              value={filters.make}
+              onChange={(e) =>
+                setFilters((current) => ({
+                  ...current,
+                  make: e.target.value,
+                  page: 1,
+                }))
+              }
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-semibold">
+            Price range
+            <div className="flex gap-2">
+              <input
+                className="border-ink/20 focus:border-brand focus:ring-brand/20 bg-white px-3 py-3 font-normal outline-none focus:ring-2 w-1/2"
+                type="number"
+                placeholder="Min"
+                value={filters.min_price || ''}
+                onChange={(e) =>
+                  setFilters((current) => ({
+                    ...current,
+                    min_price: Number(e.target.value) || 0,
+                    page: 1,
+                  }))
+                }
+              />
+              <input
+                className="border-ink/20 focus:border-brand focus:ring-brand/20 bg-white px-3 py-3 font-normal outline-none focus:ring-2 w-1/2"
+                type="number"
+                placeholder="Max"
+                value={filters.max_price || ''}
+                onChange={(e) =>
+                  setFilters((current) => ({
+                    ...current,
+                    max_price: Number(e.target.value) || 0,
+                    page: 1,
+                  }))
+                }
+              />
+            </div>
+          </label>
+          <label className="grid gap-2 text-sm font-semibold">
+            Year range
+            <div className="flex gap-2">
+              <input
+                className="border-ink/20 focus:border-brand focus:ring-brand/20 bg-white px-3 py-3 font-normal outline-none focus:ring-2 w-1/2"
+                type="number"
+                placeholder="Min"
+                value={filters.min_year || ''}
+                onChange={(e) =>
+                  setFilters((current) => ({
+                    ...current,
+                    min_year: Number(e.target.value) || 0,
+                    page: 1,
+                  }))
+                }
+              />
+              <input
+                className="border-ink/20 focus:border-brand focus:ring-brand/20 bg-white px-3 py-3 font-normal outline-none focus:ring-2 w-1/2"
+                type="number"
+                placeholder="Max"
+                value={filters.max_year || ''}
+                onChange={(e) =>
+                  setFilters((current) => ({
+                    ...current,
+                    max_year: Number(e.target.value) || 0,
+                    page: 1,
+                  }))
+                }
+              />
+            </div>
           </label>
           <div className="flex gap-3">
             <label className="border-ink/20 flex min-h-12 items-center gap-2 border bg-white px-3 text-sm">
