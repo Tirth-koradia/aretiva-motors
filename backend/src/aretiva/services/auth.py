@@ -1,7 +1,9 @@
 """Authentication use cases."""
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aretiva.core.exceptions import EmailAlreadyRegisteredError
 from aretiva.core.security import hash_password
 from aretiva.db.models.user import User, UserRole
 from aretiva.schemas.auth import RegistrationRequest
@@ -19,6 +21,10 @@ async def register_customer(
         role=UserRole.CUSTOMER,
     )
     session.add(user)
-    await session.commit()
+    try:
+        await session.commit()
+    except IntegrityError as error:
+        await session.rollback()
+        raise EmailAlreadyRegisteredError from error
     await session.refresh(user)
     return user
