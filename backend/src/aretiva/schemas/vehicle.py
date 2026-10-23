@@ -104,3 +104,30 @@ class StockActionResponse(BaseModel):
     transaction_id: UUID
     vehicle_id: UUID
     quantity_remaining: int
+
+
+class PurchasedVehicleSummary(BaseModel):
+    """The vehicle information retained alongside a customer's purchase entry."""
+
+    id: UUID
+    make: str
+    model: str
+    year: int
+    price: Decimal
+    image_url: str | None
+
+
+class PurchaseHistoryItem(BaseModel):
+    """A customer's completed one-unit purchase with its display vehicle details."""
+
+    id: UUID
+    quantity: int
+    purchased_at: datetime
+    vehicle: PurchasedVehicleSummary
+
+
+class PurchaseHistoryPage(BaseModel):
+    """A paginated private purchase ledger projection."""
+
+    items: list[PurchaseHistoryItem]
+    meta: PaginationMeta
