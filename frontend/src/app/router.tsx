@@ -4,6 +4,7 @@ import { RoutePlaceholder } from '../components/layout/RoutePlaceholder'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { RegisterPage } from '../features/auth/pages/RegisterPage'
 import { LandingPage } from '../features/marketing/pages/LandingPage'
+import { ShowroomPage } from '../features/showroom/pages/ShowroomPage'
 
 export const appRoutes: RouteObject[] = [
   {
@@ -20,7 +21,7 @@ export const appRoutes: RouteObject[] = [
   },
   {
     path: '/showroom',
-    element: <RoutePlaceholder title="Showroom" />,
+    element: <ShowroomPage />,
   },
   {
     path: '*',
