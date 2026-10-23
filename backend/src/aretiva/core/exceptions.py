@@ -1,5 +1,7 @@
 """Errors that are safe to expose through the HTTP API."""
 
+from collections.abc import Mapping
+
 from fastapi import status
 
 
@@ -9,6 +11,7 @@ class AppError(Exception):
     status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
     code: str = "APPLICATION_ERROR"
     message: str = "The request could not be completed."
+    headers: Mapping[str, str] | None = None
 
 
 class EmailAlreadyRegisteredError(AppError):
@@ -25,3 +28,12 @@ class InvalidCredentialsError(AppError):
     status_code = status.HTTP_401_UNAUTHORIZED
     code = "INVALID_CREDENTIALS"
     message = "Email or password is incorrect."
+
+
+class UnauthenticatedError(AppError):
+    """Raised when a request has no valid bearer token."""
+
+    status_code = status.HTTP_401_UNAUTHORIZED
+    code = "UNAUTHENTICATED"
+    message = "A valid access token is required."
+    headers = {"WWW-Authenticate": "Bearer"}

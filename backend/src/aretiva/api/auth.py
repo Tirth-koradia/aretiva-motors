@@ -5,6 +5,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aretiva.api.deps import get_current_user
+from aretiva.db.models.user import User
 from aretiva.db.session import get_session
 from aretiva.schemas.auth import (
     AuthenticatedUserResponse,
@@ -44,3 +46,11 @@ async def login(
         access_token=access_token,
         user=AuthenticatedUserResponse.model_validate(user),
     )
+
+
+@router.get("/me", response_model=AuthenticatedUserResponse)
+async def get_me(
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> AuthenticatedUserResponse:
+    """Return the currently authenticated user."""
+    return AuthenticatedUserResponse.model_validate(current_user)
