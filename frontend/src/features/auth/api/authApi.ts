@@ -16,6 +16,12 @@ type LoginInput = {
   password: string
 }
 
+type RegisterInput = {
+  full_name: string
+  email: string
+  password: string
+}
+
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
 
 export async function login(input: LoginInput): Promise<LoginResult> {
@@ -35,4 +41,26 @@ export async function login(input: LoginInput): Promise<LoginResult> {
   }
 
   return (await response.json()) as LoginResult
+}
+
+export async function register(
+  input: RegisterInput,
+): Promise<AuthenticatedUser> {
+  const response = await fetch(`${apiBaseUrl}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  })
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as {
+      error?: { message?: string }
+    } | null
+    throw new Error(
+      payload?.error?.message ??
+        'We could not create your account. Please try again.',
+    )
+  }
+
+  return (await response.json()) as AuthenticatedUser
 }
