@@ -90,3 +90,29 @@ export async function purchaseVehicle(
 
   return (await response.json()) as StockActionResult
 }
+
+export async function restockVehicle(
+  session: LoginResult,
+  vehicleId: string,
+  quantity: number,
+): Promise<StockActionResult> {
+  const response = await fetch(`${apiBaseUrl}/vehicles/${vehicleId}/restock`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ quantity }),
+  })
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as {
+      error?: { message?: string }
+    } | null
+    throw new Error(
+      payload?.error?.message ?? 'This stock update could not be recorded.',
+    )
+  }
+
+  return (await response.json()) as StockActionResult
+}
