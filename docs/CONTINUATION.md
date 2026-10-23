@@ -38,6 +38,17 @@ This document is intentionally maintained during development so another engineer
 8. Authenticated showroom frontend:
    - bearer-authenticated catalogue cards with responsive Verdigris Gallery styling
    - loading, empty, unauthenticated, and controlled error states
+9. Atomic stock changes and traceability:
+   - immutable `inventory_transactions` PostgreSQL ledger migration
+   - customer purchase decrements exactly one available unit with a conditional update
+   - administrator restock records the corresponding positive ledger entry
+   - real PostgreSQL concurrency test proves a final unit yields one `201`, one `409`, and zero stock
+10. Complete customer consideration flow:
+   - dedicated authenticated vehicle detail page and deliberate no-payment purchase request confirmation
+   - protected paginated `/api/purchases` endpoint and linked customer history screen
+11. Administrator bootstrap:
+   - `aretiva-admin --name "Aretiva Administrator"` creates or confirms the `ADMIN_EMAIL` account
+   - local development database has had migrations applied and contains the disposable `.test` administrator
 
 ## Important decisions
 
@@ -93,8 +104,8 @@ npm run build
 
 ## Current tests
 
-- Backend: 16 passing integration tests against isolated `aretiva_test` PostgreSQL database.
-- Frontend: 4 passing Vitest/RTL interaction tests (landing, login, registration, showroom).
+- Backend: 20 passing integration tests against isolated `aretiva_test` PostgreSQL database.
+- Frontend: 6 passing Vitest/RTL interaction tests (landing, login, registration, showroom, detail/purchase, history).
 - Current checks: Ruff format/lint, TypeScript, ESLint, frontend production build all pass.
 - The backend test client currently prints a FastAPI/Starlette `TestClient` deprecation warning; behaviour is correct, but replace it with `httpx.AsyncClient` + `ASGITransport` as a later test-harness refactor.
 
@@ -115,12 +126,13 @@ Do not squash the history before submission. Do not place tokens, passwords, pri
 
 ## Immediate next work
 
-1. Add secure, idempotent administrator bootstrap command (environment-defined credentials, not public registration). Seed documented disposable demo accounts later.
-2. Implement the transaction-ledger migration/model plus atomic one-unit purchase and administrator restock. Use a conditional PostgreSQL update and test concurrent purchases of the final unit.
-3. Add purchase history and the customer-facing vehicle-detail/purchase flow; add the matching real frontend vehicle-detail route.
-4. Add the administrator dashboard/table/form, backed by the existing server-enforced vehicle management endpoints.
-5. Extend showroom filter controls to use the search API and URL query parameters; add pagination controls.
-6. Add CI, Dockerfiles, screenshots, deploy (Vercel frontend + Render backend/PostgreSQL), then finalize README, raw `PROMPTS.md` evidence, and test report.
+1. Finish the current **red** administrator-inventory browser test at commit `9dd9814`: build `/admin/inventory` with a role check, live inventory table, and a restock-2 action calling `POST /api/vehicles/{id}/restock`. Keep the test Red -> Green sequence. Do not silently make a customer an administrator in the browser.
+2. Add the remaining administrator create/edit/delete controls. The backend endpoints already exist: `POST /api/vehicles`, `PUT /api/vehicles/{id}`, `DELETE /api/vehicles/{id}`. Reuse `VehicleCreateRequest` field rules exactly; do not add a public admin-registration path.
+3. Extend `ShowroomPage` filters and pagination to call `GET /api/vehicles/search`, keep state in URL query parameters, and support `query`, `make`, `category`, min/max price/year, `in_stock`, and only the allowlisted `sort` values.
+4. Add an admin-only transaction/activity endpoint if useful for the dashboard; the ledger model is `InventoryTransaction` and must remain append-only.
+5. Add CI, backend/frontend Dockerfiles, and a safe seed workflow. Seed accounts must be disposable and documented; never commit real credentials. Capture mobile and desktop screenshots after browser QA.
+6. Before publishing: replace root `PROMPTS.md` placeholder with the required unedited AI-conversation evidence or a valid public share/export reference; finalize README including exact heading **My AI Usage** and `docs/test-report.md` with final counts.
+7. Ask the user for a GitHub repository URL only after core UI, docs, and screenshots are ready to publish. Then add `origin`, verify `git remote -v`, and push only with explicit confirmation. Do not request passwords/tokens in chat.
 
 ## Key files
 
@@ -137,6 +149,9 @@ Do not squash the history before submission. Do not place tokens, passwords, pri
 - Landing page: `frontend/src/features/marketing/pages/LandingPage.tsx`
 - Auth pages/session: `frontend/src/features/auth/`
 - Showroom page/API client: `frontend/src/features/showroom/`
+- Purchase-history API/page: `backend/src/aretiva/api/purchases.py`, `frontend/src/features/purchases/`
+- Administrator CLI: `backend/src/aretiva/cli.py`
+- Current unimplemented browser test: `frontend/src/features/admin/pages/AdminInventoryPage.test.tsx`
 
 ## Assessment constraints to re-check before submission
 

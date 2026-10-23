@@ -23,9 +23,9 @@ This report is maintained during development and will be finalized with CI and b
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Backend integration suite | Pass | `16 passed` against isolated PostgreSQL (`aretiva_test`) |
+| Backend integration suite | Pass | `20 passed` against isolated PostgreSQL (`aretiva_test`), including final-unit concurrency protection |
 | Backend static checks | Pass | Ruff format and lint clean |
-| Frontend interaction suite | Pass | `4 passed` with Vitest + Testing Library |
+| Frontend interaction suite | Pass | `6 passed` with Vitest + Testing Library |
 | Frontend static checks | Pass | TypeScript and ESLint clean |
 | Frontend production build | Pass | Vite production bundle built successfully |
 
