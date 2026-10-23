@@ -3,6 +3,7 @@
 import os
 from collections.abc import Iterator
 from pathlib import Path
+from uuid import uuid4
 
 import psycopg
 import pytest
@@ -12,6 +13,8 @@ from psycopg import sql
 
 from alembic import command
 from aretiva.core.config import Settings
+from aretiva.core.security import create_access_token
+from aretiva.db.models.user import User, UserRole
 from aretiva.main import create_app
 
 BACKEND_ROOT = Path(__file__).parents[1]
@@ -60,13 +63,46 @@ def clean_database(migrated_database: None, database_url: str) -> None:
 
 
 @pytest.fixture
-def client(migrated_database: None) -> Iterator[TestClient]:
-    """Return an API client configured for the isolated database."""
-    del migrated_database
-    settings = Settings(
+def test_settings() -> Settings:
+    """Use deterministic credentials and database settings in the test suite."""
+    return Settings(
         environment="test",
         database_url=TEST_DATABASE_URL,
         jwt_secret="test-secret-that-is-long-enough-for-automated-tests",
     )
-    with TestClient(create_app(settings)) as test_client:
+
+
+@pytest.fixture
+def client(migrated_database: None, test_settings: Settings) -> Iterator[TestClient]:
+    """Return an API client configured for the isolated database."""
+    del migrated_database
+    with TestClient(create_app(test_settings)) as test_client:
         yield test_client
+
+
+@pytest.fixture
+def admin_headers(database_url: str, test_settings: Settings) -> dict[str, str]:
+    """Create a persisted administrator and return its signed bearer header."""
+    admin = User(
+        id=uuid4(),
+        full_name="Aretiva Administrator",
+        email="admin@aretiva.test",
+        password_hash="not-used-by-this-fixture",
+        role=UserRole.ADMIN,
+    )
+    with psycopg.connect(database_url.replace("+psycopg", ""), autocommit=True) as connection:
+        connection.execute(
+            """
+            INSERT INTO users (id, full_name, email, password_hash, role)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (
+                str(admin.id),
+                admin.full_name,
+                admin.email,
+                admin.password_hash,
+                admin.role.value,
+            ),
+        )
+
+    return {"Authorization": f"Bearer {create_access_token(admin, test_settings)}"}
