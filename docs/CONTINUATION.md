@@ -51,7 +51,7 @@ This document is intentionally maintained during development so another engineer
    - local development database has had migrations applied and contains the disposable `.test` administrator
 12. Administrator inventory desk:
    - role-gated `/admin/inventory` screen lists live inventory and can restock a vehicle
-   - administrator navigation is exposed from the showroom; authorization remains server-enforced
+   - administrator navigation is exposed from the showroom; restocking and confirmation-protected soft deletion are server-enforced
 13. Showroom refinement:
    - text search, category, availability, sort order, and server-side pagination now call the constrained search endpoint
 
@@ -131,7 +131,7 @@ Do not squash the history before submission. Do not place tokens, passwords, pri
 
 ## Immediate next work
 
-1. Add the remaining administrator create/edit/delete controls. The backend endpoints already exist: `POST /api/vehicles`, `PUT /api/vehicles/{id}`, `DELETE /api/vehicles/{id}`. Reuse `VehicleCreateRequest` field rules exactly; do not add a public admin-registration path. The current inventory page is `frontend/src/features/admin/pages/AdminInventoryPage.tsx` and the REST helpers belong in `features/showroom/api/vehiclesApi.ts` or a dedicated admin API module.
+1. Add the remaining administrator create/edit controls. The backend endpoints already exist: `POST /api/vehicles` and `PUT /api/vehicles/{id}`; deletion is now connected through the admin desk. Reuse `VehicleCreateRequest` field rules exactly; do not add a public admin-registration path. The current inventory page is `frontend/src/features/admin/pages/AdminInventoryPage.tsx` and the REST helpers belong in `features/showroom/api/vehiclesApi.ts` or a dedicated admin API module.
 2. Polish the showroom filters: mirror the selected filters and page in URL query parameters, then extend the existing server endpoint use with optional make, price, and year bounds. Keep the allowlisted sort values and never client-filter the inventory.
 3. Add an admin-only transaction/activity endpoint if useful for the dashboard; the ledger model is `InventoryTransaction` and must remain append-only.
 4. Add CI, backend/frontend Dockerfiles, and a safe seed workflow. Seed accounts must be disposable and documented; never commit real credentials. Capture mobile and desktop screenshots after browser QA.
