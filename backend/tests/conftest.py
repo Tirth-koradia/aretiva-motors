@@ -81,8 +81,13 @@ def client(migrated_database: None, test_settings: Settings) -> Iterator[TestCli
 
 
 @pytest.fixture
-def admin_headers(database_url: str, test_settings: Settings) -> dict[str, str]:
+def admin_headers(
+    clean_database: None,
+    database_url: str,
+    test_settings: Settings,
+) -> dict[str, str]:
     """Create a persisted administrator and return its signed bearer header."""
+    del clean_database
     admin = User(
         id=uuid4(),
         full_name="Aretiva Administrator",
