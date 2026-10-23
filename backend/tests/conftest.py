@@ -4,9 +4,11 @@ import os
 from collections.abc import Iterator
 from pathlib import Path
 
+import psycopg
 import pytest
 from alembic.config import Config
 from fastapi.testclient import TestClient
+from psycopg import sql
 
 from alembic import command
 from aretiva.core.config import Settings
@@ -19,7 +21,7 @@ TEST_DATABASE_URL = os.getenv(
 )
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def migrated_database() -> Iterator[None]:
     """Rebuild the isolated test schema from committed migrations."""
     alembic_config = Config(str(BACKEND_ROOT / "alembic.ini"))
@@ -37,8 +39,30 @@ def database_url() -> str:
 
 
 @pytest.fixture
-def client() -> Iterator[TestClient]:
+def clean_database(migrated_database: None, database_url: str) -> None:
+    """Remove persisted test data while preserving the migrated schema."""
+    del migrated_database
+    with psycopg.connect(database_url.replace("+psycopg", ""), autocommit=True) as connection:
+        tables = connection.execute(
+            """
+            SELECT tablename
+            FROM pg_tables
+            WHERE schemaname = 'public' AND tablename != 'alembic_version'
+            """
+        ).fetchall()
+        if tables:
+            identifiers = [sql.Identifier(table[0]) for table in tables]
+            connection.execute(
+                sql.SQL("TRUNCATE TABLE {} RESTART IDENTITY CASCADE").format(
+                    sql.SQL(", ").join(identifiers)
+                )
+            )
+
+
+@pytest.fixture
+def client(migrated_database: None) -> Iterator[TestClient]:
     """Return an API client configured for the isolated database."""
+    del migrated_database
     settings = Settings(
         environment="test",
         database_url=TEST_DATABASE_URL,

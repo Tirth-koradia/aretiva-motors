@@ -8,8 +8,10 @@ from fastapi.testclient import TestClient
 
 def test_registration_creates_customer_without_exposing_password(
     client: TestClient,
+    clean_database: None,
     database_url: str,
 ) -> None:
+    del clean_database
     password = "Aretiva!Pass2026"
 
     response = client.post(
@@ -41,3 +43,36 @@ def test_registration_creates_customer_without_exposing_password(
     assert saved_user[1] == "customer"
     assert saved_user[2] != password
     assert saved_user[2].startswith("$argon2")
+
+
+def test_registration_rejects_case_insensitive_duplicate_email(
+    client: TestClient,
+    clean_database: None,
+) -> None:
+    del clean_database
+    first_response = client.post(
+        "/api/auth/register",
+        json={
+            "full_name": "Anika Rao",
+            "email": "Anika.Rao@Example.com",
+            "password": "Aretiva!Pass2026",
+        },
+    )
+
+    duplicate_response = client.post(
+        "/api/auth/register",
+        json={
+            "full_name": "Another Anika",
+            "email": "anika.rao@example.com",
+            "password": "Another!Pass2026",
+        },
+    )
+
+    assert first_response.status_code == 201
+    assert duplicate_response.status_code == 409
+    assert duplicate_response.json() == {
+        "error": {
+            "code": "EMAIL_ALREADY_REGISTERED",
+            "message": "An account with this email already exists.",
+        }
+    }
