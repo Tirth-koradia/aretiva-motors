@@ -1,5 +1,6 @@
 """Vehicle inventory use cases."""
 
+from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -47,6 +48,25 @@ async def get_active_vehicle(session: AsyncSession, vehicle_id: UUID) -> Vehicle
         select(Vehicle).where(Vehicle.id == vehicle_id, Vehicle.deleted_at.is_(None))
     )
     return result.scalar_one_or_none()
+
+
+async def update_vehicle(
+    session: AsyncSession,
+    vehicle: Vehicle,
+    vehicle_data: VehicleCreateRequest,
+) -> Vehicle:
+    """Replace editable vehicle attributes with administrator-supplied values."""
+    for field_name, value in vehicle_data.model_dump().items():
+        setattr(vehicle, field_name, value)
+    await session.commit()
+    await session.refresh(vehicle)
+    return vehicle
+
+
+async def soft_delete_vehicle(session: AsyncSession, vehicle: Vehicle) -> None:
+    """Retain an audit-friendly record while hiding it from active inventory."""
+    vehicle.deleted_at = datetime.now(UTC)
+    await session.commit()
 
 
 async def search_active_vehicles(

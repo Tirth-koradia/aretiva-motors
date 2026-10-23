@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aretiva.api.deps import get_current_user, require_role
@@ -24,6 +24,8 @@ from aretiva.services.vehicles import (
     get_active_vehicle,
     list_active_vehicles,
     search_active_vehicles,
+    soft_delete_vehicle,
+    update_vehicle,
 )
 
 router = APIRouter(prefix="/vehicles", tags=["vehicles"])
@@ -102,6 +104,35 @@ async def get_vehicle(
     if vehicle is None:
         raise VehicleNotFoundError
     return VehicleResponse.model_validate(vehicle)
+
+
+@router.put("/{vehicle_id}", response_model=VehicleResponse)
+async def update(
+    vehicle_id: UUID,
+    vehicle_data: VehicleCreateRequest,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    _: Annotated[User, Depends(require_role(UserRole.ADMIN))],
+) -> VehicleResponse:
+    """Update an active vehicle; administrator access is required."""
+    vehicle = await get_active_vehicle(session, vehicle_id)
+    if vehicle is None:
+        raise VehicleNotFoundError
+    updated_vehicle = await update_vehicle(session, vehicle, vehicle_data)
+    return VehicleResponse.model_validate(updated_vehicle)
+
+
+@router.delete("/{vehicle_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete(
+    vehicle_id: UUID,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    _: Annotated[User, Depends(require_role(UserRole.ADMIN))],
+) -> Response:
+    """Soft-delete an active vehicle; administrator access is required."""
+    vehicle = await get_active_vehicle(session, vehicle_id)
+    if vehicle is None:
+        raise VehicleNotFoundError
+    await soft_delete_vehicle(session, vehicle)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("", response_model=VehicleResponse, status_code=status.HTTP_201_CREATED)
