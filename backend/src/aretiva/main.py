@@ -7,6 +7,7 @@ from typing import Literal
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from aretiva.api.router import api_router
 from aretiva.core.config import Settings, get_settings
 from aretiva.db.session import create_database_engine, create_session_factory
 
@@ -36,6 +37,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     application.state.settings = resolved_settings
     application.state.session_factory = create_session_factory(engine)
+    application.include_router(api_router)
 
     @application.get("/health", response_model=HealthResponse, tags=["system"])
     async def health() -> HealthResponse:

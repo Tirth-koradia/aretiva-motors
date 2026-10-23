@@ -8,6 +8,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
+from aretiva.db import models  # noqa: F401
 from aretiva.db.base import Base
 
 config = context.config
