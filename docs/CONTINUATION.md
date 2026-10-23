@@ -49,6 +49,11 @@ This document is intentionally maintained during development so another engineer
 11. Administrator bootstrap:
    - `aretiva-admin --name "Aretiva Administrator"` creates or confirms the `ADMIN_EMAIL` account
    - local development database has had migrations applied and contains the disposable `.test` administrator
+12. Administrator inventory desk:
+   - role-gated `/admin/inventory` screen lists live inventory and can restock a vehicle
+   - administrator navigation is exposed from the showroom; authorization remains server-enforced
+13. Showroom refinement:
+   - text search, category, availability, sort order, and server-side pagination now call the constrained search endpoint
 
 ## Important decisions
 
@@ -61,7 +66,7 @@ This document is intentionally maintained during development so another engineer
 - Purchasing exactly one unit will be atomic: conditional `UPDATE ... WHERE quantity >= 1`, transaction record in the same transaction, test concurrent final-item purchases against real PostgreSQL.
 - Zero-stock vehicles remain visible but cannot be purchased.
 - Customer purchases and administrator restocks must create immutable inventory transactions.
-- Use server-side filtering and pagination. Put showroom filters and page in the URL.
+- Use server-side filtering and pagination. The filters are server-backed already; a remaining polish item is mirroring them in the URL.
 - Do not add real payments, carts, recommendations, or microservices until all assessment essentials are polished.
 
 ## Run locally
@@ -105,7 +110,7 @@ npm run build
 ## Current tests
 
 - Backend: 20 passing integration tests against isolated `aretiva_test` PostgreSQL database.
-- Frontend: 6 passing Vitest/RTL interaction tests (landing, login, registration, showroom, detail/purchase, history).
+- Frontend: 7 passing Vitest/RTL interaction tests (landing, login, registration, showroom, detail/purchase, history, administrator restock).
 - Current checks: Ruff format/lint, TypeScript, ESLint, frontend production build all pass.
 - The backend test client currently prints a FastAPI/Starlette `TestClient` deprecation warning; behaviour is correct, but replace it with `httpx.AsyncClient` + `ASGITransport` as a later test-harness refactor.
 
@@ -126,13 +131,12 @@ Do not squash the history before submission. Do not place tokens, passwords, pri
 
 ## Immediate next work
 
-1. Finish the current **red** administrator-inventory browser test at commit `9dd9814`: build `/admin/inventory` with a role check, live inventory table, and a restock-2 action calling `POST /api/vehicles/{id}/restock`. Keep the test Red -> Green sequence. Do not silently make a customer an administrator in the browser.
-2. Add the remaining administrator create/edit/delete controls. The backend endpoints already exist: `POST /api/vehicles`, `PUT /api/vehicles/{id}`, `DELETE /api/vehicles/{id}`. Reuse `VehicleCreateRequest` field rules exactly; do not add a public admin-registration path.
-3. Extend `ShowroomPage` filters and pagination to call `GET /api/vehicles/search`, keep state in URL query parameters, and support `query`, `make`, `category`, min/max price/year, `in_stock`, and only the allowlisted `sort` values.
-4. Add an admin-only transaction/activity endpoint if useful for the dashboard; the ledger model is `InventoryTransaction` and must remain append-only.
-5. Add CI, backend/frontend Dockerfiles, and a safe seed workflow. Seed accounts must be disposable and documented; never commit real credentials. Capture mobile and desktop screenshots after browser QA.
-6. Before publishing: replace root `PROMPTS.md` placeholder with the required unedited AI-conversation evidence or a valid public share/export reference; finalize README including exact heading **My AI Usage** and `docs/test-report.md` with final counts.
-7. Ask the user for a GitHub repository URL only after core UI, docs, and screenshots are ready to publish. Then add `origin`, verify `git remote -v`, and push only with explicit confirmation. Do not request passwords/tokens in chat.
+1. Add the remaining administrator create/edit/delete controls. The backend endpoints already exist: `POST /api/vehicles`, `PUT /api/vehicles/{id}`, `DELETE /api/vehicles/{id}`. Reuse `VehicleCreateRequest` field rules exactly; do not add a public admin-registration path. The current inventory page is `frontend/src/features/admin/pages/AdminInventoryPage.tsx` and the REST helpers belong in `features/showroom/api/vehiclesApi.ts` or a dedicated admin API module.
+2. Polish the showroom filters: mirror the selected filters and page in URL query parameters, then extend the existing server endpoint use with optional make, price, and year bounds. Keep the allowlisted sort values and never client-filter the inventory.
+3. Add an admin-only transaction/activity endpoint if useful for the dashboard; the ledger model is `InventoryTransaction` and must remain append-only.
+4. Add CI, backend/frontend Dockerfiles, and a safe seed workflow. Seed accounts must be disposable and documented; never commit real credentials. Capture mobile and desktop screenshots after browser QA.
+5. Before publishing: replace root `PROMPTS.md` placeholder with the required unedited AI-conversation evidence or a valid public share/export reference; finalize README including exact heading **My AI Usage** and `docs/test-report.md` with final counts.
+6. Ask the user for a GitHub repository URL only after core UI, docs, and screenshots are ready to publish. Then add `origin`, verify `git remote -v`, and push only with explicit confirmation. Do not request passwords/tokens in chat.
 
 ## Key files
 
@@ -151,7 +155,7 @@ Do not squash the history before submission. Do not place tokens, passwords, pri
 - Showroom page/API client: `frontend/src/features/showroom/`
 - Purchase-history API/page: `backend/src/aretiva/api/purchases.py`, `frontend/src/features/purchases/`
 - Administrator CLI: `backend/src/aretiva/cli.py`
-- Current unimplemented browser test: `frontend/src/features/admin/pages/AdminInventoryPage.test.tsx`
+- Administrator inventory page/test: `frontend/src/features/admin/pages/AdminInventoryPage.tsx`
 
 ## Assessment constraints to re-check before submission
 
