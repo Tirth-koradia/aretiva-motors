@@ -145,3 +145,22 @@ export async function restockVehicle(
 
   return (await response.json()) as StockActionResult
 }
+
+export async function deleteVehicle(
+  session: LoginResult,
+  vehicleId: string,
+): Promise<void> {
+  const response = await fetch(`${apiBaseUrl}/vehicles/${vehicleId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  })
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as {
+      error?: { message?: string }
+    } | null
+    throw new Error(
+      payload?.error?.message ?? 'This vehicle could not be removed.',
+    )
+  }
+}

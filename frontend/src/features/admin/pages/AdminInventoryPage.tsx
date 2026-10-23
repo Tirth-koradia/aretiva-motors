@@ -2,7 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 
 import { readSession } from '../../auth/session'
-import { getVehicles, restockVehicle } from '../../showroom/api/vehiclesApi'
+import {
+  deleteVehicle,
+  getVehicles,
+  restockVehicle,
+} from '../../showroom/api/vehiclesApi'
 
 function formatPrice(price: string) {
   return new Intl.NumberFormat('en-IN', {
@@ -28,6 +32,11 @@ export function AdminInventoryPage() {
       vehicleId: string
       quantity: number
     }) => restockVehicle(session!, vehicleId, quantity),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['vehicles', 'admin'] }),
+  })
+  const deleteMutation = useMutation({
+    mutationFn: (vehicleId: string) => deleteVehicle(session!, vehicleId),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ['vehicles', 'admin'] }),
   })
@@ -114,6 +123,22 @@ export function AdminInventoryPage() {
             {restockMutation.error.message}
           </p>
         ) : null}
+        {deleteMutation.isSuccess ? (
+          <p
+            className="border-brand bg-mist mt-8 border px-4 py-3 font-semibold"
+            role="status"
+          >
+            Vehicle removed from the active collection.
+          </p>
+        ) : null}
+        {deleteMutation.isError ? (
+          <p
+            className="border-accent bg-accent/10 mt-8 border px-4 py-3"
+            role="alert"
+          >
+            {deleteMutation.error.message}
+          </p>
+        ) : null}
 
         {vehiclesQuery.data ? (
           <div className="border-ink/15 mt-12 overflow-x-auto border">
@@ -124,7 +149,7 @@ export function AdminInventoryPage() {
                   <th className="px-5 py-4 font-semibold">Vehicle</th>
                   <th className="px-5 py-4 font-semibold">Price</th>
                   <th className="px-5 py-4 font-semibold">Availability</th>
-                  <th className="px-5 py-4 font-semibold">Action</th>
+                  <th className="px-5 py-4 font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -154,19 +179,43 @@ export function AdminInventoryPage() {
                       </span>
                     </td>
                     <td className="px-5 py-5">
-                      <button
-                        className="border-brand text-brand hover:bg-brand hover:text-canvas min-h-10 border px-4 text-sm font-semibold transition-colors disabled:cursor-wait disabled:opacity-55"
-                        disabled={restockMutation.isPending}
-                        onClick={() =>
-                          restockMutation.mutate({
-                            vehicleId: vehicle.id,
-                            quantity: 2,
-                          })
-                        }
-                        type="button"
-                      >
-                        Restock 2
-                      </button>
+                      <div className="flex flex-wrap gap-3">
+                        <button
+                          className="border-brand text-brand hover:bg-brand hover:text-canvas min-h-10 border px-4 text-sm font-semibold transition-colors disabled:cursor-wait disabled:opacity-55"
+                          disabled={
+                            restockMutation.isPending ||
+                            deleteMutation.isPending
+                          }
+                          onClick={() =>
+                            restockMutation.mutate({
+                              vehicleId: vehicle.id,
+                              quantity: 2,
+                            })
+                          }
+                          type="button"
+                        >
+                          Restock 2
+                        </button>
+                        <button
+                          className="border-accent text-accent hover:bg-accent hover:text-canvas min-h-10 border px-4 text-sm font-semibold transition-colors disabled:cursor-wait disabled:opacity-55"
+                          disabled={
+                            restockMutation.isPending ||
+                            deleteMutation.isPending
+                          }
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                `Remove ${vehicle.make} ${vehicle.model} from the active collection?`,
+                              )
+                            ) {
+                              deleteMutation.mutate(vehicle.id)
+                            }
+                          }}
+                          type="button"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
