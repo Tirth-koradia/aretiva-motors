@@ -28,10 +28,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-        if resolved_settings.admin_email and resolved_settings.admin_password:
-            try:
-                session_factory = create_session_factory(engine)
-                async with session_factory() as session:
+        try:
+            session_factory = create_session_factory(engine)
+            async with session_factory() as session:
+                if resolved_settings.admin_email and resolved_settings.admin_password:
                     from aretiva.services.auth import ensure_administrator
 
                     await ensure_administrator(
@@ -40,8 +40,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                         email=str(resolved_settings.admin_email),
                         password=resolved_settings.admin_password,
                     )
-            except Exception:
-                pass
+                from aretiva.services.seed import seed_demo_vehicles
+
+                await seed_demo_vehicles(session)
+        except Exception:
+            pass
         yield
         await engine.dispose()
 

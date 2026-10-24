@@ -31,6 +31,20 @@ async def bootstrap_admin(settings: Settings, full_name: str) -> None:
         await engine.dispose()
 
 
+async def seed_inventory(settings: Settings) -> None:
+    """Seed curated demo vehicles into the inventory."""
+    from aretiva.services.seed import seed_demo_vehicles
+
+    engine = create_database_engine(settings.database_url)
+    session_factory = create_session_factory(engine)
+    try:
+        async with session_factory() as session:
+            count = await seed_demo_vehicles(session)
+            print(f"Seeded {count} demo vehicles into inventory.")
+    finally:
+        await engine.dispose()
+
+
 def main() -> None:
     """Parse operator-only commands."""
     parser = argparse.ArgumentParser(prog="aretiva-admin")
@@ -39,8 +53,17 @@ def main() -> None:
         default="Aretiva Administrator",
         help="Display name for a newly created administrator.",
     )
+    parser.add_argument(
+        "--seed",
+        action="store_true",
+        help="Seed catalog with curated demo vehicles.",
+    )
     arguments = parser.parse_args()
-    asyncio.run(bootstrap_admin(get_settings(), arguments.name))
+    settings = get_settings()
+    if arguments.seed:
+        asyncio.run(seed_inventory(settings))
+    else:
+        asyncio.run(bootstrap_admin(settings, arguments.name))
 
 
 if __name__ == "__main__":
