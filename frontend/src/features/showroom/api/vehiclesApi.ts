@@ -33,7 +33,10 @@ export type VehicleSearchFilters = {
   page?: number
 }
 
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
+const apiBaseUrl =
+  import.meta.env.MODE === 'test'
+    ? 'http://localhost:8000/api'
+    : (import.meta.env.VITE_API_URL || '/api')
 
 export async function getVehicles(
   session: LoginResult,
@@ -163,4 +166,40 @@ export async function deleteVehicle(
       payload?.error?.message ?? 'This vehicle could not be removed.',
     )
   }
+}
+
+export async function createVehicle(session: LoginResult, payload: Omit<Vehicle, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>): Promise<Vehicle> {
+  const response = await fetch(`${apiBaseUrl}/vehicles`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    const payloadErr = await response.json().catch(() => null) as { error?: { message?: string } } | null
+    throw new Error(payloadErr?.error?.message ?? 'Could not create vehicle.')
+  }
+
+  return (await response.json()) as Vehicle
+}
+
+export async function updateVehicle(session: LoginResult, vehicleId: string, payload: Partial<Omit<Vehicle, 'id' | 'created_at' | 'updated_at' | 'deleted_at'>>): Promise<Vehicle> {
+  const response = await fetch(`${apiBaseUrl}/vehicles/${vehicleId}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    const payloadErr = await response.json().catch(() => null) as { error?: { message?: string } } | null
+    throw new Error(payloadErr?.error?.message ?? 'Could not update vehicle.')
+  }
+
+  return (await response.json()) as Vehicle
 }

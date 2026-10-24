@@ -1,12 +1,11 @@
+import React, { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 
 import { readSession } from '../../auth/session'
-import {
-  deleteVehicle,
-  getVehicles,
-  restockVehicle,
-} from '../../showroom/api/vehiclesApi'
+import { deleteVehicle, getVehicles, restockVehicle } from '../../showroom/api/vehiclesApi'
+import AdminVehicleFormModal from '../components/AdminVehicleFormModal'
+import { Vehicle } from '../../showroom/api/vehiclesApi'
 
 function formatPrice(price: string) {
   return new Intl.NumberFormat('en-IN', {
@@ -24,6 +23,8 @@ export function AdminInventoryPage() {
     queryFn: () => getVehicles(session!),
     enabled: session?.user.role === 'admin',
   })
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
   const restockMutation = useMutation({
     mutationFn: ({
       vehicleId,
@@ -90,10 +91,22 @@ export function AdminInventoryPage() {
               Inventory desk.
             </h1>
           </div>
-          <p className="text-ink/65 max-w-sm leading-7">
-            A precise view of availability, designed for quick, accountable
-            adjustments.
-          </p>
+          <div className="flex flex-col items-start gap-4 sm:items-end">
+            <p className="text-ink/65 max-w-sm leading-7 sm:text-right">
+              A precise view of availability, designed for quick, accountable
+              adjustments.
+            </p>
+            <button
+              className="bg-brand text-canvas hover:bg-brand/90 min-h-11 px-5 text-sm font-semibold transition-colors"
+              onClick={() => {
+                setEditingVehicle(null)
+                setIsModalOpen(true)
+              }}
+              type="button"
+            >
+              + Add new vehicle
+            </button>
+          </div>
         </div>
 
         {vehiclesQuery.isPending ? (
@@ -197,6 +210,17 @@ export function AdminInventoryPage() {
                           Restock 2
                         </button>
                         <button
+                          className="border-brand text-brand hover:bg-brand/10 min-h-10 border px-4 text-sm font-semibold transition-colors disabled:cursor-wait disabled:opacity-55"
+                          disabled={restockMutation.isPending || deleteMutation.isPending}
+                          onClick={() => {
+                            setEditingVehicle(vehicle)
+                            setIsModalOpen(true)
+                          }}
+                          type="button"
+                        >
+                          Edit
+                        </button>
+                        <button
                           className="border-accent text-accent hover:bg-accent hover:text-canvas min-h-10 border px-4 text-sm font-semibold transition-colors disabled:cursor-wait disabled:opacity-55"
                           disabled={
                             restockMutation.isPending ||
@@ -223,6 +247,18 @@ export function AdminInventoryPage() {
             </table>
           </div>
         ) : null}
+
+        <AdminVehicleFormModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false)
+            setEditingVehicle(null)
+          }}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ['vehicles', 'admin'] })
+          }}
+          vehicle={editingVehicle}
+        />
       </main>
     </div>
   )
