@@ -115,7 +115,7 @@ DEMO_VEHICLES = [
             "Supercharged 518 hp 5.0L V8 with quad outboard exhaust pipes, electronic active "
             "rear differential, 22-inch satin dark grey wheels, and Ebony Windsor leather."
         ),
-        "image_url": "https://images.unsplash.com/photo-1541348263662-e0c8de4259ba?auto=format&fit=crop&w=1200&q=80",
+        "image_url": "https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=1200&q=80",
     },
     {
         "vin": "WP0BC2Y14PSA91823",
