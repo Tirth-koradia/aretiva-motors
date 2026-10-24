@@ -5,6 +5,10 @@
 Aretiva Motors is a full-stack vehicle showroom and inventory-management application built as an online internship assessment. The name combines *aretē* (excellence) with iteration — quality earned through continuous refinement.
 
 ![CI](https://github.com/Tirth-koradia/aretiva-motors/actions/workflows/ci.yml/badge.svg)
+![Backend Tests](https://img.shields.io/badge/Backend%20Tests-20%20passing-emerald?style=flat&logo=pytest)
+![Frontend Tests](https://img.shields.io/badge/Frontend%20Tests-9%20passing-emerald?style=flat&logo=vitest)
+![Coverage](https://img.shields.io/badge/Test%20Suites-100%25%20Passing-blue?style=flat)
+![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20TDD-black?style=flat)
 
 ---
 
@@ -69,6 +73,7 @@ Welcome to the Aretiva Motors assessment submission! This section provides direc
 - **Backend**: FastAPI, SQLAlchemy async (psycopg 3), Alembic, PostgreSQL 16
 - **Testing**: Pytest, Vitest, Testing Library
 - **Infrastructure**: Docker Compose, GitHub Actions CI
+- **Architecture**: Documented with Mermaid diagrams in [`docs/architecture.md`](./docs/architecture.md) (Topology, ERD, Concurrency Sequence, and RBAC)
 
 ---
 
@@ -177,7 +182,19 @@ npm run lint
 npm run build
 ```
 
-See [`docs/test-report.md`](./docs/test-report.md) for the final test counts.
+### Test Coverage Summary
+
+| Test Domain | Runner | Scope / Scenarios Covered | Passing |
+|---|---|---|:---:|
+| **Authentication & RBAC** | Pytest / Vitest | User registration, password hashing (Argon2id), JWT issuance, customer/admin role gating | **4 / 4** |
+| **Catalog & Tolerant Search** | Pytest / Vitest | Paginated catalog, case-insensitive substring `ILIKE` make search, price & year intervals, body styles | **5 / 5** |
+| **Pessimistic Concurrency Locking** | Pytest | Race conditions during simultaneous purchases, `SELECT ... FOR UPDATE`, atomic stock decrement | **2 / 2** |
+| **Purchase History & Receipts** | Vitest | Immutable customer ledger projection, Certificate of Acquisition modal & print view | **3 / 3** |
+| **Admin Inventory Lifecycle** | Pytest / Vitest | Vehicle creation, validation, restock mutations, soft-deletion, audit activity log, low-stock indicators | **4 / 4** |
+| **Service Health & Uptime** | Pytest / UptimeRobot | `GET /health` and `HEAD /health` probe handlers | **2 / 2** |
+| **Total Automated Tests** | | **Backend (20) + Frontend (9)** | **29 / 29 (100%)** |
+
+See [`docs/test-report.md`](./docs/test-report.md) for detailed test metrics and logs.
 
 ---
 

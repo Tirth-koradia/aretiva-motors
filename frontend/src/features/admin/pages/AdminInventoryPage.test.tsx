@@ -64,6 +64,7 @@ describe('administrator inventory desk', () => {
       screen.getByRole('heading', { name: 'Inventory desk.' }),
     ).toBeInTheDocument()
     expect(await screen.findByText('Honda City ZX')).toBeInTheDocument()
+    expect(screen.getByText(/Low Stock/i)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Restock 2' }))
 
     expect(await screen.findByRole('status')).toHaveTextContent(

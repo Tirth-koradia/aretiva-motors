@@ -198,16 +198,27 @@ export function AdminInventoryPage() {
                       {formatPrice(vehicle.price)}
                     </td>
                     <td className="px-5 py-5">
-                      <span
-                        className={
-                          vehicle.quantity === 0
-                            ? 'text-accent font-semibold'
-                            : 'text-brand font-semibold'
-                        }
-                      >
-                        {vehicle.quantity}{' '}
-                        {vehicle.quantity === 1 ? 'unit' : 'units'}
-                      </span>
+                      <div className="flex flex-col gap-1.5 items-start">
+                        <span
+                          className={
+                            vehicle.quantity === 0
+                              ? 'text-accent font-semibold'
+                              : 'text-brand font-semibold'
+                          }
+                        >
+                          {vehicle.quantity}{' '}
+                          {vehicle.quantity === 1 ? 'unit' : 'units'}
+                        </span>
+                        {vehicle.quantity === 0 ? (
+                          <span className="inline-flex items-center rounded-xs bg-accent/15 px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase text-accent border border-accent/30">
+                            Depleted
+                          </span>
+                        ) : vehicle.quantity <= 1 ? (
+                          <span className="inline-flex items-center rounded-xs bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase text-amber-800 border border-amber-600/30">
+                            Low Stock (1 left)
+                          </span>
+                        ) : null}
+                      </div>
                     </td>
                     <td className="px-5 py-5">
                       <div className="flex flex-wrap gap-3">

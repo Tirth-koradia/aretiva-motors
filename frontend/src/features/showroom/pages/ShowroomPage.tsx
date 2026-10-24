@@ -137,7 +137,54 @@ export function ShowroomPage() {
     if (filters.min_year) params.set('min_year', String(filters.min_year));
     if (filters.max_year) params.set('max_year', String(filters.max_year));
     setSearchParams(params);
-  }, [filters, setSearchParams]);
+  }, [filters, setSearchParams])
+
+  const hasActiveFilters = Boolean(
+    filters.query ||
+      filters.make ||
+      filters.category ||
+      filters.min_price ||
+      filters.max_price ||
+      filters.min_year ||
+      filters.max_year ||
+      filters.inStock,
+  )
+
+  const removeFilter = (key: keyof ShowroomFilters) => {
+    setFilters((prev) => {
+      switch (key) {
+        case 'min_price':
+        case 'max_price':
+        case 'min_year':
+        case 'max_year':
+          return { ...prev, [key]: 0, page: 1 }
+        case 'inStock':
+          return { ...prev, inStock: false, page: 1 }
+        case 'query':
+        case 'make':
+        case 'category':
+          return { ...prev, [key]: '', page: 1 }
+        default:
+          return { ...prev, page: 1 }
+      }
+    })
+  }
+
+  const clearAllFilters = () => {
+    setFilters({
+      query: '',
+      category: '',
+      inStock: false,
+      sort: 'newest',
+      page: 1,
+      make: '',
+      min_price: 0,
+      max_price: 0,
+      min_year: 0,
+      max_year: 0,
+    })
+  }
+
   const vehiclesQuery = useQuery({
     queryKey: ['vehicles', 'showroom', filters],
     queryFn: () => getVehicles(session!, filters),
@@ -410,6 +457,116 @@ export function ShowroomPage() {
             </button>
           </div>
         </form>
+
+        <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-ink/10 pb-5">
+          <div className="flex items-center gap-2">
+            <span className="text-ink/80 text-sm font-medium">
+              {vehiclesQuery.isPending ? (
+                'Consulting inventory…'
+              ) : vehiclesQuery.data ? (
+                vehiclesQuery.data.meta.total === 1
+                  ? 'Showing 1 curated vehicle'
+                  : `Showing ${vehiclesQuery.data.meta.total} curated vehicles`
+              ) : null}
+            </span>
+            {hasActiveFilters && vehiclesQuery.data ? (
+              <span className="text-xs text-ink/50 font-normal">
+                (filtered from collection)
+              </span>
+            ) : null}
+          </div>
+
+          {hasActiveFilters ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs uppercase tracking-wider text-ink/40 font-semibold mr-1">
+                Active filters:
+              </span>
+              {filters.query ? (
+                <button
+                  aria-label={`Remove Search: ${filters.query} filter`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-ink/20 bg-canvas px-3 py-1 text-xs font-medium text-ink/80 hover:border-brand hover:text-brand transition-colors cursor-pointer group"
+                  onClick={() => removeFilter('query')}
+                  type="button"
+                >
+                  <span>Search: &ldquo;{filters.query}&rdquo;</span>
+                  <span className="text-ink/40 group-hover:text-brand text-sm leading-none font-bold">×</span>
+                </button>
+              ) : null}
+              {filters.make ? (
+                <button
+                  aria-label={`Remove Make: ${filters.make} filter`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-ink/20 bg-canvas px-3 py-1 text-xs font-medium text-ink/80 hover:border-brand hover:text-brand transition-colors cursor-pointer group"
+                  onClick={() => removeFilter('make')}
+                  type="button"
+                >
+                  <span>Make: {filters.make}</span>
+                  <span className="text-ink/40 group-hover:text-brand text-sm leading-none font-bold">×</span>
+                </button>
+              ) : null}
+              {filters.category ? (
+                <button
+                  aria-label={`Remove Style: ${filters.category} filter`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-ink/20 bg-canvas px-3 py-1 text-xs font-medium text-ink/80 hover:border-brand hover:text-brand transition-colors cursor-pointer group"
+                  onClick={() => removeFilter('category')}
+                  type="button"
+                >
+                  <span className="capitalize">Style: {filters.category}</span>
+                  <span className="text-ink/40 group-hover:text-brand text-sm leading-none font-bold">×</span>
+                </button>
+              ) : null}
+              {filters.min_price || filters.max_price ? (
+                <button
+                  aria-label="Remove Price range filter"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-ink/20 bg-canvas px-3 py-1 text-xs font-medium text-ink/80 hover:border-brand hover:text-brand transition-colors cursor-pointer group"
+                  onClick={() => {
+                    removeFilter('min_price')
+                    removeFilter('max_price')
+                  }}
+                  type="button"
+                >
+                  <span>
+                    Price: {filters.min_price ? `₹${filters.min_price}` : 'Min'} - {filters.max_price ? `₹${filters.max_price}` : 'Max'}
+                  </span>
+                  <span className="text-ink/40 group-hover:text-brand text-sm leading-none font-bold">×</span>
+                </button>
+              ) : null}
+              {filters.min_year || filters.max_year ? (
+                <button
+                  aria-label="Remove Year range filter"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-ink/20 bg-canvas px-3 py-1 text-xs font-medium text-ink/80 hover:border-brand hover:text-brand transition-colors cursor-pointer group"
+                  onClick={() => {
+                    removeFilter('min_year')
+                    removeFilter('max_year')
+                  }}
+                  type="button"
+                >
+                  <span>
+                    Year: {filters.min_year || 'Min'} - {filters.max_year || 'Max'}
+                  </span>
+                  <span className="text-ink/40 group-hover:text-brand text-sm leading-none font-bold">×</span>
+                </button>
+              ) : null}
+              {filters.inStock ? (
+                <button
+                  aria-label="Remove In Stock filter"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-ink/20 bg-canvas px-3 py-1 text-xs font-medium text-ink/80 hover:border-brand hover:text-brand transition-colors cursor-pointer group"
+                  onClick={() => removeFilter('inStock')}
+                  type="button"
+                >
+                  <span>Available Now</span>
+                  <span className="text-ink/40 group-hover:text-brand text-sm leading-none font-bold">×</span>
+                </button>
+              ) : null}
+              <button
+                className="text-xs text-brand hover:text-ink underline underline-offset-4 font-semibold transition-colors cursor-pointer ml-1"
+                onClick={clearAllFilters}
+                type="button"
+              >
+                Clear all
+              </button>
+            </div>
+          ) : null}
+        </div>
 
         {vehiclesQuery.isPending ? (
           <p className="text-ink/65 mt-12">Preparing the collection…</p>
