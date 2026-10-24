@@ -21,11 +21,9 @@ type RegisterInput = {
   email: string
   password: string
 }
+import { getApiBaseUrl } from '../../../shared/api/config'
 
-const apiBaseUrl =
-  import.meta.env.MODE === 'test'
-    ? 'http://localhost:8000/api'
-    : (import.meta.env.VITE_API_URL || '/api')
+const apiBaseUrl = getApiBaseUrl()
 
 export async function login(input: LoginInput): Promise<LoginResult> {
   const response = await fetch(`${apiBaseUrl}/auth/login`, {

@@ -28,6 +28,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        if resolved_settings.admin_email and resolved_settings.admin_password:
+            try:
+                session_factory = create_session_factory(engine)
+                async with session_factory() as session:
+                    from aretiva.services.auth import ensure_administrator
+
+                    await ensure_administrator(
+                        session,
+                        full_name="Aretiva Administrator",
+                        email=str(resolved_settings.admin_email),
+                        password=resolved_settings.admin_password,
+                    )
+            except Exception:
+                pass
         yield
         await engine.dispose()
 
@@ -52,13 +66,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     from fastapi.middleware.cors import CORSMiddleware
 
-    application.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    if "*" in origins:
+        application.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+    else:
+        application.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_origin_regex=r"^https://.*\.vercel\.app$",
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
     application.state.settings = resolved_settings
     application.state.session_factory = create_session_factory(engine)

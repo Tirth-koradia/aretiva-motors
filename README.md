@@ -160,6 +160,14 @@ See [`docs/test-report.md`](./docs/test-report.md) for the final test counts.
 
 ---
 
+## Deployment
+
+A complete production deployment guide for deploying the frontend to **Vercel** and the backend + database to **Render** is available in [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md).
+
+- **Render Blueprint:** [`render.yaml`](./render.yaml) provisions the PostgreSQL database and FastAPI service.
+- **Vercel Config:** [`frontend/vercel.json`](./frontend/vercel.json) configures SPA rewrite routing.
+
+
 ## My AI Usage
 
 AI is being used as a collaborative engineering tool for requirement analysis, design exploration, implementation support, test review, and documentation. Every AI suggestion is reviewed, adapted, and verified with automated tests before committing.

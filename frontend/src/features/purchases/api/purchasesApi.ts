@@ -18,11 +18,9 @@ export type PurchaseHistoryPage = {
   items: PurchaseHistoryItem[]
   meta: { page: number; page_size: number; total: number; total_pages: number }
 }
+import { getApiBaseUrl } from '../../../shared/api/config'
 
-const apiBaseUrl =
-  import.meta.env.MODE === 'test'
-    ? 'http://localhost:8000/api'
-    : (import.meta.env.VITE_API_URL || '/api')
+const apiBaseUrl = getApiBaseUrl()
 
 export async function getPurchaseHistory(
   session: LoginResult,

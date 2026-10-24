@@ -14,3 +14,10 @@ This file is the chronological index for the raw, unedited AI conversations used
 
 Further implementation sessions will be appended without rewriting or sanitising their technical content. If a conversation ever contains a secret, it will not be published; the secret will be rotated and the omission will be disclosed here.
 
+## Session 2 — CI, Docker containerization, production deployment, and multi-cloud readiness
+
+- Date: 24 October 2026
+- Tool: Antigravity / OpenAI Codex
+- Topics: GitHub Actions CI runner fixes (Python 3.13, PostgreSQL port mapping, Alembic env configuration), Docker multi-stage build fixes, SPA routing rewrite for Vercel, dynamic port and scheme normalization for Render deployment, Render blueprint (`render.yaml`).
+- Human decisions: Selected Vercel for React frontend edge hosting and Render for FastAPI backend and managed PostgreSQL; added automated startup administrator bootstrap.
+

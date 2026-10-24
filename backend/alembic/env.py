@@ -19,11 +19,23 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 
+def _normalize_url(url: str | None) -> str | None:
+    """Ensure async psycopg scheme is used when connecting to cloud postgres."""
+    if not url:
+        return url
+    if url.startswith("postgres://"):
+        return "postgresql+psycopg://" + url[len("postgres://") :]
+    if url.startswith("postgresql://") and not url.startswith("postgresql+"):
+        return "postgresql+psycopg://" + url[len("postgresql://") :]
+    return url
+
+
 def run_migrations_offline() -> None:
     """Run migrations without creating a database connection."""
     import os
 
-    url = os.getenv("DATABASE_URL") or config.get_main_option("sqlalchemy.url")
+    raw_url = os.getenv("DATABASE_URL") or config.get_main_option("sqlalchemy.url")
+    url = _normalize_url(raw_url)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -49,7 +61,7 @@ async def run_async_migrations() -> None:
     import os
 
     configuration = config.get_section(config.config_ini_section, {})
-    database_url = os.getenv("DATABASE_URL")
+    database_url = _normalize_url(os.getenv("DATABASE_URL"))
     if database_url:
         configuration["sqlalchemy.url"] = database_url
 
