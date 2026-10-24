@@ -19,7 +19,10 @@ export type PurchaseHistoryPage = {
   meta: { page: number; page_size: number; total: number; total_pages: number }
 }
 
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
+const apiBaseUrl =
+  import.meta.env.MODE === 'test'
+    ? 'http://localhost:8000/api'
+    : (import.meta.env.VITE_API_URL || '/api')
 
 export async function getPurchaseHistory(
   session: LoginResult,

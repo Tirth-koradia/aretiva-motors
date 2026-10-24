@@ -131,7 +131,7 @@ export function ShowroomPage() {
     if (filters.min_year) params.set('min_year', String(filters.min_year));
     if (filters.max_year) params.set('max_year', String(filters.max_year));
     setSearchParams(params);
-  }, [filters]);
+  }, [filters, setSearchParams]);
   const vehiclesQuery = useQuery({
     queryKey: ['vehicles', 'showroom', filters],
     queryFn: () => getVehicles(session!, filters),
