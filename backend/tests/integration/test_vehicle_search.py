@@ -94,3 +94,12 @@ def test_customer_can_filter_and_sort_active_inventory(
         "899000.00",
         "1489000.00",
     ]
+
+    # Partial make query also matches tolerantly
+    partial_response = client.get(
+        "/api/vehicles/search?make=Hon",
+        headers=customer_headers(client),
+    )
+    assert partial_response.status_code == 200
+    assert partial_response.json()["meta"]["total"] == 2
+

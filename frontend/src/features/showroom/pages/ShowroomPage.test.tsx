@@ -61,4 +61,36 @@ describe('private showroom', () => {
     expect(screen.getByText('18,420 km')).toBeInTheDocument()
     expect(screen.getByText('Pre-owned')).toBeInTheDocument()
   })
+
+  it('signs the user out when clicking the sign out button', async () => {
+    window.localStorage.setItem(
+      'aretiva.session',
+      JSON.stringify({
+        access_token: 'test-access-token',
+        token_type: 'bearer',
+        user: {
+          id: '6dc4fa1b-8f6d-49a7-b65e-36ee0af42c4e',
+          full_name: 'Mira Shah',
+          email: 'mira.shah@example.com',
+          role: 'customer',
+        },
+      }),
+    )
+    server.use(
+      http.get('http://localhost:8000/api/vehicles', () => {
+        return HttpResponse.json({
+          items: [],
+          meta: { page: 1, page_size: 12, total: 0, total_pages: 0 },
+        })
+      }),
+    )
+
+    const { user } = renderApp('/showroom')
+
+    const signOutBtn = await screen.findByRole('button', { name: 'Sign out' })
+    expect(signOutBtn).toBeInTheDocument()
+
+    await user.click(signOutBtn)
+    expect(window.localStorage.getItem('aretiva.session')).toBeNull()
+  })
 })

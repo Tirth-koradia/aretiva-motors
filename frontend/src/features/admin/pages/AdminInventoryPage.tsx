@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
-import { readSession } from '../../auth/session'
+import { clearSession, readSession } from '../../auth/session'
 import { deleteVehicle, getVehicles, restockVehicle } from '../../showroom/api/vehiclesApi'
 import AdminVehicleFormModal from '../components/AdminVehicleFormModal'
 import { Vehicle } from '../../showroom/api/vehiclesApi'
@@ -17,7 +17,13 @@ function formatPrice(price: string) {
 
 export function AdminInventoryPage() {
   const session = readSession()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
+
+  const handleSignOut = () => {
+    clearSession()
+    navigate('/login')
+  }
   const vehiclesQuery = useQuery({
     queryKey: ['vehicles', 'admin'],
     queryFn: () => getVehicles(session!),
@@ -73,12 +79,24 @@ export function AdminInventoryPage() {
           >
             Aretiva Motors
           </Link>
-          <Link
-            className="text-ink/65 text-sm underline underline-offset-4"
-            to="/showroom"
-          >
-            View showroom
-          </Link>
+          <div className="flex items-center gap-5 text-sm">
+            <Link
+              className="text-ink/65 hover:text-brand underline underline-offset-4 transition-colors"
+              to="/showroom"
+            >
+              View showroom
+            </Link>
+            <div className="flex items-center gap-3">
+              <span className="text-ink/75 font-medium">{session.user.full_name}</span>
+              <button
+                className="rounded-xs border border-ink/20 px-2.5 py-1 text-xs font-semibold text-ink/70 hover:border-brand hover:text-brand transition-colors cursor-pointer"
+                onClick={handleSignOut}
+                type="button"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10 lg:py-16">

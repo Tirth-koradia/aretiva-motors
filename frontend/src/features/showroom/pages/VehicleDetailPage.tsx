@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 
-import { readSession } from '../../auth/session'
+import { clearSession, readSession } from '../../auth/session'
 import { getVehicle, purchaseVehicle } from '../api/vehiclesApi'
 
 function formatPrice(price: string) {
@@ -18,8 +18,14 @@ function formatKilometres(distance: number) {
 
 export function VehicleDetailPage() {
   const { vehicleId } = useParams()
+  const navigate = useNavigate()
   const session = readSession()
   const queryClient = useQueryClient()
+
+  const handleSignOut = () => {
+    clearSession()
+    navigate('/login')
+  }
   const vehicleQuery = useQuery({
     queryKey: ['vehicle', vehicleId],
     queryFn: () => getVehicle(session!, vehicleId!),
@@ -98,12 +104,24 @@ export function VehicleDetailPage() {
           >
             Aretiva Motors
           </Link>
-          <Link
-            className="text-ink/65 text-sm underline underline-offset-4"
-            to="/showroom"
-          >
-            Back to showroom
-          </Link>
+          <div className="flex items-center gap-5 text-sm">
+            <Link
+              className="text-ink/65 hover:text-brand underline underline-offset-4 transition-colors"
+              to="/showroom"
+            >
+              Back to showroom
+            </Link>
+            <div className="flex items-center gap-3">
+              <span className="text-ink/75 font-medium">{session.user.full_name}</span>
+              <button
+                className="rounded-xs border border-ink/20 px-2.5 py-1 text-xs font-semibold text-ink/70 hover:border-brand hover:text-brand transition-colors cursor-pointer"
+                onClick={handleSignOut}
+                type="button"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-10 lg:py-16">

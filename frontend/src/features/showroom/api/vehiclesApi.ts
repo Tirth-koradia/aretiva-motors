@@ -27,7 +27,12 @@ export type VehiclePage = {
 
 export type VehicleSearchFilters = {
   query?: string
+  make?: string
   category?: string
+  min_price?: number
+  max_price?: number
+  min_year?: number
+  max_year?: number
   inStock?: boolean
   sort?: 'newest' | 'price_asc' | 'price_desc' | 'year_desc'
   page?: number
@@ -42,7 +47,12 @@ export async function getVehicles(
 ): Promise<VehiclePage> {
   const usesSearch = Boolean(
     filters.query ||
+    filters.make ||
     filters.category ||
+    filters.min_price ||
+    filters.max_price ||
+    filters.min_year ||
+    filters.max_year ||
     filters.inStock ||
     (filters.sort && filters.sort !== 'newest'),
   )
@@ -52,7 +62,12 @@ export async function getVehicles(
   })
 
   if (filters.query) params.set('query', filters.query)
+  if (filters.make) params.set('make', filters.make)
   if (filters.category) params.set('category', filters.category)
+  if (filters.min_price) params.set('min_price', String(filters.min_price))
+  if (filters.max_price) params.set('max_price', String(filters.max_price))
+  if (filters.min_year) params.set('min_year', String(filters.min_year))
+  if (filters.max_year) params.set('max_year', String(filters.max_year))
   if (filters.inStock) params.set('in_stock', 'true')
   if (filters.sort && filters.sort !== 'newest')
     params.set('sort', filters.sort)

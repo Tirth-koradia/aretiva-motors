@@ -180,7 +180,7 @@ async def search_active_vehicles(
             )
         )
     if make and make.strip():
-        filters.append(func.lower(Vehicle.make) == make.strip().lower())
+        filters.append(Vehicle.make.ilike(f"%{make.strip()}%"))
     if category is not None:
         filters.append(Vehicle.category == category)
     if min_price is not None:

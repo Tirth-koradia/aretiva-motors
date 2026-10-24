@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { readSession } from '../../auth/session'
+import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { clearSession, readSession } from '../../auth/session'
 import { getVehicles, type Vehicle, type VehicleSearchFilters } from '../api/vehiclesApi'
 
 function formatPrice(price: string) {
@@ -92,8 +92,14 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
 }
 
 export function ShowroomPage() {
-  const session = readSession();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const session = readSession()
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const handleSignOut = () => {
+    clearSession()
+    navigate('/login')
+  }
 
   type ShowroomFilters = VehicleSearchFilters & {
     sort?: VehicleSearchFilters['sort'];
@@ -175,20 +181,29 @@ export function ShowroomPage() {
           <div className="flex items-center gap-5 text-sm">
             {session.user.role === 'admin' ? (
               <Link
-                className="text-ink/65 underline underline-offset-4"
+                className="text-ink/65 hover:text-brand underline underline-offset-4 transition-colors"
                 to="/admin/inventory"
               >
                 Inventory desk
               </Link>
             ) : (
               <Link
-                className="text-ink/65 underline underline-offset-4"
+                className="text-ink/65 hover:text-brand underline underline-offset-4 transition-colors"
                 to="/purchases"
               >
                 Your considerations
               </Link>
             )}
-            <p className="text-ink/65">{session.user.full_name}</p>
+            <div className="flex items-center gap-3">
+              <span className="text-ink/75 font-medium">{session.user.full_name}</span>
+              <button
+                className="rounded-xs border border-ink/20 px-2.5 py-1 text-xs font-semibold text-ink/70 hover:border-brand hover:text-brand transition-colors cursor-pointer"
+                onClick={handleSignOut}
+                type="button"
+              >
+                Sign out
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -368,10 +383,30 @@ export function ShowroomPage() {
               Available now
             </label>
             <button
-              className="bg-brand text-canvas min-h-12 px-5 text-sm font-semibold"
+              className="bg-brand text-canvas hover:bg-ink min-h-12 px-5 text-sm font-semibold transition-colors cursor-pointer"
               type="submit"
             >
               Refine
+            </button>
+            <button
+              className="border-ink/20 text-ink/75 hover:border-ink hover:text-ink min-h-12 border px-4 text-sm font-medium transition-colors cursor-pointer"
+              onClick={() => {
+                setFilters({
+                  query: '',
+                  category: '',
+                  inStock: false,
+                  sort: 'newest',
+                  page: 1,
+                  make: '',
+                  min_price: 0,
+                  max_price: 0,
+                  min_year: 0,
+                  max_year: 0,
+                })
+              }}
+              type="button"
+            >
+              Reset
             </button>
           </div>
         </form>
