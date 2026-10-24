@@ -18,9 +18,10 @@ from aretiva.db.models.user import User, UserRole
 from aretiva.main import create_app
 
 BACKEND_ROOT = Path(__file__).parents[1]
-TEST_DATABASE_URL = os.getenv(
-    "TEST_DATABASE_URL",
-    "postgresql+psycopg://aretiva:aretiva_dev@localhost:55432/aretiva_test",
+TEST_DATABASE_URL = (
+    os.getenv("TEST_DATABASE_URL")
+    or os.getenv("DATABASE_URL")
+    or "postgresql+psycopg://aretiva:aretiva_dev@localhost:55432/aretiva_test"
 )
 
 
