@@ -90,6 +90,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(api_router)
 
     @application.get("/health", response_model=HealthResponse, tags=["system"])
+    @application.head("/health", include_in_schema=False)
     async def health() -> HealthResponse:
         return HealthResponse()
 
