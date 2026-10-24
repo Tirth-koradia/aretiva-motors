@@ -21,8 +21,11 @@ target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
     """Run migrations without creating a database connection."""
+    import os
+
+    url = os.getenv("DATABASE_URL") or config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=config.get_main_option("sqlalchemy.url"),
+        url=url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -43,7 +46,13 @@ def apply_migrations(connection: Connection) -> None:
 
 async def run_async_migrations() -> None:
     """Create the async engine used for online migrations."""
+    import os
+
     configuration = config.get_section(config.config_ini_section, {})
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        configuration["sqlalchemy.url"] = database_url
+
     connectable = async_engine_from_config(
         configuration,
         prefix="sqlalchemy.",
