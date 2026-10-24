@@ -48,4 +48,24 @@ describe('login page', () => {
       .toContain('test-access-token')
     expect(navigateSpy).toHaveBeenCalledWith('/showroom')
   })
+
+  it('autofills customer and admin credentials when clicking reviewer buttons', async () => {
+    const { user } = renderApp('/login')
+
+    const customerBtn = screen.getByRole('button', { name: /Customer Demo/i })
+    const adminBtn = screen.getByRole('button', { name: /Admin Demo/i })
+
+    await user.click(customerBtn)
+    expect(screen.getByLabelText('Email address')).toHaveValue(
+      'mira.shah@example.com',
+    )
+    expect(screen.getByLabelText('Password')).toHaveValue('Customer1234!')
+
+    await user.click(adminBtn)
+    expect(screen.getByLabelText('Email address')).toHaveValue(
+      'admin@aretiva.com',
+    )
+    expect(screen.getByLabelText('Password')).toHaveValue('ChangeMe123!')
+  })
 })
+
