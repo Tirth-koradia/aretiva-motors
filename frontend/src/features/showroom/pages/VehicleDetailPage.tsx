@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
+import { ReviewerRoleSwitcher } from '../../auth/components/ReviewerRoleSwitcher'
 import { clearSession, readSession } from '../../auth/session'
 import { getVehicle, purchaseVehicle } from '../api/vehiclesApi'
 
@@ -16,11 +18,20 @@ function formatKilometres(distance: number) {
   return new Intl.NumberFormat('en-IN').format(distance)
 }
 
+function calculateEmi(principal: number, annualRatePct: number, months: number): number {
+  if (principal <= 0 || months <= 0) return 0
+  const monthlyRate = annualRatePct / 12 / 100
+  const factor = Math.pow(1 + monthlyRate, months)
+  return Math.round((principal * monthlyRate * factor) / (factor - 1))
+}
+
 export function VehicleDetailPage() {
   const { vehicleId } = useParams()
   const navigate = useNavigate()
   const session = readSession()
   const queryClient = useQueryClient()
+  const [downPaymentPct, setDownPaymentPct] = useState(20)
+  const [tenureMonths, setTenureMonths] = useState(36)
 
   const handleSignOut = () => {
     clearSession()
@@ -111,6 +122,7 @@ export function VehicleDetailPage() {
             >
               Back to showroom
             </Link>
+            <ReviewerRoleSwitcher currentRole={session.user.role} />
             <div className="flex items-center gap-3">
               <span className="text-ink/75 font-medium">{session.user.full_name}</span>
               <button
@@ -188,6 +200,95 @@ export function VehicleDetailPage() {
                 </div>
               ))}
             </dl>
+
+            {(() => {
+              const numericPrice = Number(vehicle.price) || 0
+              const downPaymentAmount = Math.round(numericPrice * (downPaymentPct / 100))
+              const financedAmount = Math.max(0, numericPrice - downPaymentAmount)
+              const monthlyEmi = calculateEmi(financedAmount, 8.5, tenureMonths)
+
+              return (
+                <div className="border-ink/15 bg-mist/60 mt-8 rounded-sm border p-5 sm:p-6">
+                  <div className="flex items-center justify-between border-b border-ink/10 pb-3">
+                    <div>
+                      <p className="text-brand text-xs font-semibold tracking-[0.2em] uppercase">
+                        Bespoke Acquisition Plan
+                      </p>
+                      <h3 className="font-display text-xl mt-0.5">Financing & EMI Estimator</h3>
+                    </div>
+                    <span className="text-ink/50 text-xs font-medium">8.5% APR</span>
+                  </div>
+
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="text-ink/70 text-xs font-semibold block mb-1.5">
+                        Down Payment ({downPaymentPct}%)
+                      </label>
+                      <div className="flex gap-2">
+                        {[20, 30, 50].map((pct) => (
+                          <button
+                            key={pct}
+                            type="button"
+                            onClick={() => setDownPaymentPct(pct)}
+                            className={`rounded-xs border px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                              downPaymentPct === pct
+                                ? 'border-brand bg-brand text-canvas'
+                                : 'border-ink/20 bg-canvas text-ink/70 hover:border-brand'
+                            }`}
+                          >
+                            {pct}%
+                          </button>
+                        ))}
+                      </div>
+                      <span className="text-ink/50 text-[11px] block mt-1">
+                        {formatPrice(String(downPaymentAmount))} deposit
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="text-ink/70 text-xs font-semibold block mb-1.5">
+                        Tenure
+                      </label>
+                      <div className="flex gap-2">
+                        {[36, 48, 60].map((months) => (
+                          <button
+                            key={months}
+                            type="button"
+                            onClick={() => setTenureMonths(months)}
+                            className={`rounded-xs border px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                              tenureMonths === months
+                                ? 'border-brand bg-brand text-canvas'
+                                : 'border-ink/20 bg-canvas text-ink/70 hover:border-brand'
+                            }`}
+                          >
+                            {months} mos
+                          </button>
+                        ))}
+                      </div>
+                      <span className="text-ink/50 text-[11px] block mt-1">
+                        {tenureMonths / 12} years financing
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="border-ink/10 mt-5 border-t pt-4 flex items-baseline justify-between">
+                    <div>
+                      <span className="text-ink/60 text-xs">Estimated Monthly Investment</span>
+                      <p className="font-display text-3xl text-ink font-semibold">
+                        {formatPrice(String(monthlyEmi))}
+                        <span className="text-xs text-ink/50 font-normal"> / month</span>
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-ink/40 text-[11px] block">Financed Principal</span>
+                      <span className="text-xs text-ink/70 font-semibold">
+                        {formatPrice(String(financedAmount))}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
 
             {purchaseMutation.isSuccess ? (
               <p

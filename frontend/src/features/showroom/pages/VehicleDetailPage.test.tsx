@@ -77,4 +77,33 @@ describe('vehicle detail page', () => {
       'Purchase request recorded.',
     )
   })
+
+  it('renders the interactive financing and EMI estimator', async () => {
+    window.localStorage.setItem(
+      'aretiva.session',
+      JSON.stringify({
+        access_token: 'test-access-token',
+        token_type: 'bearer',
+        user: {
+          id: '6dc4fa1b-8f6d-49a7-b65e-36ee0af42c4e',
+          full_name: 'Mira Shah',
+          email: 'mira.shah@example.com',
+          role: 'customer',
+        },
+      }),
+    )
+    server.use(
+      http.get(`http://localhost:8000/api/vehicles/${vehicle.id}`, () =>
+        HttpResponse.json(vehicle),
+      ),
+    )
+
+    renderApp(`/showroom/${vehicle.id}`)
+
+    expect(
+      await screen.findByRole('heading', { name: 'Financing & EMI Estimator' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Estimated Monthly Investment')).toBeInTheDocument()
+    expect(screen.getByText(/36 mos/i)).toBeInTheDocument()
+  })
 })

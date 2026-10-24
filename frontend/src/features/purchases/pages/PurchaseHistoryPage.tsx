@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
 
+import { ReviewerRoleSwitcher } from '../../auth/components/ReviewerRoleSwitcher'
 import { clearSession, readSession } from '../../auth/session'
 import { getPurchaseHistory, type PurchaseHistoryItem } from '../api/purchasesApi'
 
@@ -64,6 +65,7 @@ export function PurchaseHistoryPage() {
             >
               Return to showroom
             </Link>
+            <ReviewerRoleSwitcher currentRole={session.user.role} />
             <div className="flex items-center gap-3">
               <span className="text-ink/75 font-medium">{session.user.full_name}</span>
               <button

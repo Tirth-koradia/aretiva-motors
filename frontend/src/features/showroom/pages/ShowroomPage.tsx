@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { ReviewerRoleSwitcher } from '../../auth/components/ReviewerRoleSwitcher'
 import { clearSession, readSession } from '../../auth/session'
 import { getVehicles, type Vehicle, type VehicleSearchFilters } from '../api/vehiclesApi'
 
@@ -241,6 +242,7 @@ export function ShowroomPage() {
                 Your considerations
               </Link>
             )}
+            <ReviewerRoleSwitcher currentRole={session.user.role} />
             <div className="flex items-center gap-3">
               <span className="text-ink/75 font-medium">{session.user.full_name}</span>
               <button
