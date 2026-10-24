@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # ── Backend production image ─────────────────────────────────────────────────
-FROM python:3.12-slim AS base
+FROM python:3.13-slim AS base
 
 WORKDIR /app
 
@@ -9,12 +9,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies via PEP 517 build
-COPY pyproject.toml ./
-RUN pip install --no-cache-dir -e '.'
-
-# Copy application source
+# Copy configuration, readme, migrations, and source
+COPY pyproject.toml README.md alembic.ini ./
+COPY alembic/ ./alembic/
 COPY src/ ./src/
+
+# Install application and dependencies via PEP 517 build
+RUN pip install --no-cache-dir .
 
 # ── Runtime ───────────────────────────────────────────────────────────────────
 FROM base AS runtime
