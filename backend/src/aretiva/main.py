@@ -37,6 +37,29 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         description="Vehicle inventory, purchasing, and administration API.",
         lifespan=lifespan,
     )
+    origins = [
+        origin.strip() for origin in resolved_settings.cors_origins.split(",") if origin.strip()
+    ]
+    fallback_origins = (
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+    )
+    for fallback_origin in fallback_origins:
+        if fallback_origin not in origins:
+            origins.append(fallback_origin)
+
+    from fastapi.middleware.cors import CORSMiddleware
+
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
     application.state.settings = resolved_settings
     application.state.session_factory = create_session_factory(engine)
     application.add_exception_handler(AppError, app_error_handler)
