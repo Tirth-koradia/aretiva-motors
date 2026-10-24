@@ -32,7 +32,15 @@ export function LandingPage() {
               Aretiva Motors
             </span>
           </Link>
-          <nav aria-label="Primary">
+          <nav aria-label="Primary" className="flex items-center gap-6">
+            <a
+              className="text-ink/65 hover:text-brand hidden text-xs font-medium sm:inline-block transition-colors"
+              href="https://aretiva-backend.onrender.com/docs"
+              rel="noreferrer"
+              target="_blank"
+            >
+              API Docs ↗
+            </a>
             <Link
               className="decoration-accent hover:text-brand underline-offset-8 transition-colors hover:underline"
               to="/login"
@@ -131,7 +139,18 @@ export function LandingPage() {
       <footer className="border-ink/15 relative z-10 border-t">
         <div className="text-ink/65 mx-auto flex max-w-7xl flex-col gap-2 px-5 py-5 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
           <span>An independent automotive gallery.</span>
-          <span>Excellence through iteration.</span>
+          <div className="flex items-center gap-4 text-xs">
+            <span>Excellence through iteration.</span>
+            <span aria-hidden="true" className="text-ink/20">|</span>
+            <a
+              className="text-brand hover:text-ink underline underline-offset-4 transition-colors font-medium"
+              href="https://aretiva-backend.onrender.com/docs"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Interactive API Docs (Swagger) ↗
+            </a>
+          </div>
         </div>
       </footer>
     </div>

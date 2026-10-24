@@ -8,6 +8,47 @@ Aretiva Motors is a full-stack vehicle showroom and inventory-management applica
 
 ---
 
+## Reviewer Quickstart & Evaluation Guide
+
+Welcome to the Aretiva Motors assessment submission! This section provides direct links, verified credentials, and a guided 3-minute tour of all evaluated requirements.
+
+### Live Environments & API Docs
+
+| Service | Link | Description |
+|---|---|---|
+| **Live Web Application** | [Aretiva Motors Frontend](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/) | Deployed on Vercel with SPA routing |
+| **Interactive API Docs** | [FastAPI Swagger UI](https://aretiva-backend.onrender.com/docs) | Live OpenAPI documentation & interactive explorer on Render |
+| **API Health Status** | [`GET /health`](https://aretiva-backend.onrender.com/health) | Production service status & health monitoring |
+
+### 1-Click Demo Credentials
+
+> **Tip:** The `/login` page features **1-Click Reviewer Autofill** buttons that instantly populate verified credentials for both personas without needing to type or copy-paste.
+
+| Persona | Email | Password | Primary Capabilities |
+|---|---|---|---|
+| **Customer** | `mira.shah@example.com` | `Customer1234!` | Browse showroom, multi-param search/refine, purchase vehicles, view purchase history |
+| **Administrator** | `admin@aretiva.com` | `ChangeMe123!` | Access inventory desk, create vehicles, restock units, update specs, soft-delete, audit logs |
+
+### 3-Minute Evaluation Tour
+
+1. **Multi-Parameter Filter & Tolerant Search**:
+   - Go to `/showroom` and search Make with `mercedes` or `porsche` — matches tolerantly via case-insensitive `ILIKE`.
+   - Test category filtering (e.g. `Coupe`, `SUV`), price ranges, and year constraints.
+   - Click **Reset** to instantly restore all 13 luxury listings.
+2. **Purchase Workflow & Concurrency Protection**:
+   - Select any available vehicle (e.g., *Aston Martin Vantage Coupe*).
+   - Click **Acquire vehicle** to execute a transactional purchase. Inventory atomically decrements, preventing overselling under concurrency locks (`SELECT ... FOR UPDATE`).
+   - Navigate to **Your considerations** (`/purchases`) to review the immutable ledger projection.
+3. **Sold-Out Enforcement**:
+   - Locate the seeded *Lexus LC 500* (`quantity: 0`). The acquisition CTA is securely disabled and badged as **Sold Out**.
+4. **Admin Operations & Restock Flow**:
+   - Switch to the Admin account (click **Sign out** → click **Admin Demo**).
+   - Enter the **Inventory desk** (`/admin/inventory`) to create new inventory, update vehicle pricing, or restock depleted units.
+5. **Interactive OpenAPI Contract**:
+   - Visit the [Swagger Documentation](https://aretiva-backend.onrender.com/docs) to inspect live endpoint schemas, request bodies, and responses.
+
+---
+
 ## Features
 
 | Layer | Capability |

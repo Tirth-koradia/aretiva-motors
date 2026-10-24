@@ -128,23 +128,67 @@ export function LoginPage() {
                 ? 'Entering the showroom…'
                 : 'Enter the showroom'}
             </button>
+            <div className="border-ink/15 bg-ink/[0.03] mt-6 rounded-sm border p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-brand text-xs font-semibold tracking-[0.2em] uppercase">
+                  Reviewer Quick Access
+                </p>
+                <span className="text-ink/40 text-[11px]">1-click fill</span>
+              </div>
+              <p className="text-ink/65 mt-1 text-xs">
+                Populate verified demo credentials for evaluation:
+              </p>
+              <div className="mt-3 grid grid-cols-2 gap-2.5">
+                <button
+                  className="border-ink/20 hover:border-brand hover:text-brand bg-canvas rounded-xs border p-2.5 text-left transition-colors cursor-pointer"
+                  onClick={() => {
+                    setEmail('mira.shah@example.com')
+                    setPassword('Customer1234!')
+                  }}
+                  type="button"
+                >
+                  <span className="text-ink block text-xs font-semibold">Customer Demo</span>
+                  <span className="text-ink/60 block text-[11px]">Mira Shah</span>
+                </button>
+                <button
+                  className="border-ink/20 hover:border-brand hover:text-brand bg-canvas rounded-xs border p-2.5 text-left transition-colors cursor-pointer"
+                  onClick={() => {
+                    setEmail('admin@aretiva.com')
+                    setPassword('ChangeMe123!')
+                  }}
+                  type="button"
+                >
+                  <span className="text-ink block text-xs font-semibold">Admin Demo</span>
+                  <span className="text-ink/60 block text-[11px]">Administrator</span>
+                </button>
+              </div>
+            </div>
           </form>
 
-          <p className="text-ink/65 mt-8 text-sm">
-            New to Aretiva?{' '}
-            <Link
-              className="text-brand decoration-accent font-semibold underline underline-offset-4"
-              to="/register"
-            >
-              Create an account
-            </Link>
-          </p>
-          <Link
-            className="text-ink/65 mt-8 inline-block text-sm underline underline-offset-4"
-            to="/"
-          >
-            Back to the introduction
-          </Link>
+          <div className="border-ink/10 mt-8 border-t pt-6 flex flex-col gap-3 text-sm">
+            <p className="text-ink/65">
+              New to Aretiva?{' '}
+              <Link
+                className="text-brand decoration-accent font-semibold underline underline-offset-4"
+                to="/register"
+              >
+                Create an account
+              </Link>
+            </p>
+            <div className="flex items-center justify-between text-xs text-ink/60">
+              <Link className="hover:text-brand underline underline-offset-4 transition-colors" to="/">
+                ← Back to introduction
+              </Link>
+              <a
+                className="hover:text-brand underline underline-offset-4 transition-colors"
+                href="https://aretiva-backend.onrender.com/docs"
+                rel="noreferrer"
+                target="_blank"
+              >
+                Live API Swagger Docs ↗
+              </a>
+            </div>
+          </div>
         </div>
       </section>
     </main>
