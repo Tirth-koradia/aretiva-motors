@@ -30,7 +30,7 @@ Welcome to the Aretiva Motors assessment submission! This section provides direc
 
 | Persona | Email | Password | Primary Capabilities |
 |---|---|---|---|
-| **Customer** | `mira.shah@example.com` | `Customer1234!` | Browse showroom, multi-param search/refine, purchase vehicles, view purchase history |
+| **Customer** | `tirth.koradia@example.com` | `Customer1234!` | Browse showroom, multi-param search/refine, purchase vehicles, view purchase history |
 | **Administrator** | `admin@aretiva.com` | `ChangeMe123!` | Access inventory desk, create vehicles, restock units, update specs, soft-delete, audit logs |
 
 ### 3-Minute Evaluation Tour

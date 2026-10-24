@@ -28,14 +28,14 @@ def customer_headers(client: TestClient) -> dict[str, str]:
     client.post(
         "/api/auth/register",
         json={
-            "full_name": "Mira Shah",
-            "email": "mira.shah@example.com",
+            "full_name": "Tirth Koradia",
+            "email": "tirth.koradia@example.com",
             "password": "Aretiva!Pass2026",
         },
     )
     login_response = client.post(
         "/api/auth/login",
-        json={"email": "mira.shah@example.com", "password": "Aretiva!Pass2026"},
+        json={"email": "tirth.koradia@example.com", "password": "Aretiva!Pass2026"},
     )
     return {"Authorization": f"Bearer {login_response.json()['access_token']}"}
 

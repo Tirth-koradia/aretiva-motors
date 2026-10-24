@@ -11,8 +11,8 @@ def test_login_returns_a_bearer_token_and_safe_customer_profile(
     registration_response = client.post(
         "/api/auth/register",
         json={
-            "full_name": "Mira Shah",
-            "email": "mira.shah@example.com",
+            "full_name": "Tirth Koradia",
+            "email": "tirth.koradia@example.com",
             "password": "Aretiva!Pass2026",
         },
     )
@@ -20,7 +20,7 @@ def test_login_returns_a_bearer_token_and_safe_customer_profile(
     login_response = client.post(
         "/api/auth/login",
         json={
-            "email": "MIRA.SHAH@example.com",
+            "email": "TIRTH.KORADIA@example.com",
             "password": "Aretiva!Pass2026",
         },
     )
@@ -33,8 +33,8 @@ def test_login_returns_a_bearer_token_and_safe_customer_profile(
     assert len(payload["access_token"]) > 20
     assert payload["user"] == {
         "id": registration_response.json()["id"],
-        "full_name": "Mira Shah",
-        "email": "mira.shah@example.com",
+        "full_name": "Tirth Koradia",
+        "email": "tirth.koradia@example.com",
         "role": "customer",
     }
     assert "password" not in payload

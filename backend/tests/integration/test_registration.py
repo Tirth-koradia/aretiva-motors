@@ -17,8 +17,8 @@ def test_registration_creates_customer_without_exposing_password(
     response = client.post(
         "/api/auth/register",
         json={
-            "full_name": "Mira Shah",
-            "email": "mira.shah@example.com",
+            "full_name": "Tirth Koradia",
+            "email": "tirth.koradia@example.com",
             "password": password,
         },
     )
@@ -26,8 +26,8 @@ def test_registration_creates_customer_without_exposing_password(
     assert response.status_code == 201
     payload = response.json()
     UUID(payload["id"])
-    assert payload["full_name"] == "Mira Shah"
-    assert payload["email"] == "mira.shah@example.com"
+    assert payload["full_name"] == "Tirth Koradia"
+    assert payload["email"] == "tirth.koradia@example.com"
     assert payload["role"] == "customer"
     assert "password" not in payload
     assert "password_hash" not in payload
@@ -39,7 +39,7 @@ def test_registration_creates_customer_without_exposing_password(
         ).fetchone()
 
     assert saved_user is not None
-    assert saved_user[0] == "mira.shah@example.com"
+    assert saved_user[0] == "tirth.koradia@example.com"
     assert saved_user[1] == "customer"
     assert saved_user[2] != password
     assert saved_user[2].startswith("$argon2")

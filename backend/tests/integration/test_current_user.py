@@ -11,15 +11,15 @@ def test_authenticated_request_returns_the_current_user(
     registration_response = client.post(
         "/api/auth/register",
         json={
-            "full_name": "Mira Shah",
-            "email": "mira.shah@example.com",
+            "full_name": "Tirth Koradia",
+            "email": "tirth.koradia@example.com",
             "password": "Aretiva!Pass2026",
         },
     )
     login_response = client.post(
         "/api/auth/login",
         json={
-            "email": "mira.shah@example.com",
+            "email": "tirth.koradia@example.com",
             "password": "Aretiva!Pass2026",
         },
     )
@@ -34,8 +34,8 @@ def test_authenticated_request_returns_the_current_user(
     assert response.status_code == 200
     assert response.json() == {
         "id": registration_response.json()["id"],
-        "full_name": "Mira Shah",
-        "email": "mira.shah@example.com",
+        "full_name": "Tirth Koradia",
+        "email": "tirth.koradia@example.com",
         "role": "customer",
     }
 

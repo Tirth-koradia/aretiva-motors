@@ -19,7 +19,7 @@ describe('login page', () => {
     server.use(
       http.post('http://localhost:8000/api/auth/login', async ({ request }) => {
         expect(await request.json()).toEqual({
-          email: 'mira.shah@example.com',
+          email: 'tirth.koradia@example.com',
           password: 'Aretiva!Pass2026',
         })
         return HttpResponse.json({
@@ -27,8 +27,8 @@ describe('login page', () => {
           token_type: 'bearer',
           user: {
             id: '6dc4fa1b-8f6d-49a7-b65e-36ee0af42c4e',
-            full_name: 'Mira Shah',
-            email: 'mira.shah@example.com',
+            full_name: 'Tirth Koradia',
+            email: 'tirth.koradia@example.com',
             role: 'customer',
           },
         })
@@ -38,7 +38,7 @@ describe('login page', () => {
 
     await user.type(
       screen.getByLabelText('Email address'),
-      'mira.shah@example.com',
+      'tirth.koradia@example.com',
     )
     await user.type(screen.getByLabelText('Password'), 'Aretiva!Pass2026')
     await user.click(screen.getByRole('button', { name: 'Enter the showroom' }))
@@ -57,7 +57,7 @@ describe('login page', () => {
 
     await user.click(customerBtn)
     expect(screen.getByLabelText('Email address')).toHaveValue(
-      'mira.shah@example.com',
+      'tirth.koradia@example.com',
     )
     expect(screen.getByLabelText('Password')).toHaveValue('Customer1234!')
 

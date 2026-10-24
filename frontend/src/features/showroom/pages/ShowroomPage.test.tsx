@@ -14,8 +14,8 @@ describe('private showroom', () => {
         token_type: 'bearer',
         user: {
           id: '6dc4fa1b-8f6d-49a7-b65e-36ee0af42c4e',
-          full_name: 'Mira Shah',
-          email: 'mira.shah@example.com',
+          full_name: 'Tirth Koradia',
+          email: 'tirth.koradia@example.com',
           role: 'customer',
         },
       }),
@@ -70,8 +70,8 @@ describe('private showroom', () => {
         token_type: 'bearer',
         user: {
           id: '6dc4fa1b-8f6d-49a7-b65e-36ee0af42c4e',
-          full_name: 'Mira Shah',
-          email: 'mira.shah@example.com',
+          full_name: 'Tirth Koradia',
+          email: 'tirth.koradia@example.com',
           role: 'customer',
         },
       }),
@@ -102,8 +102,8 @@ describe('private showroom', () => {
         token_type: 'bearer',
         user: {
           id: '6dc4fa1b-8f6d-49a7-b65e-36ee0af42c4e',
-          full_name: 'Mira Shah',
-          email: 'mira.shah@example.com',
+          full_name: 'Tirth Koradia',
+          email: 'tirth.koradia@example.com',
           role: 'customer',
         },
       }),

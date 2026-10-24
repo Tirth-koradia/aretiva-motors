@@ -21,15 +21,15 @@ describe('registration page', () => {
         'http://localhost:8000/api/auth/register',
         async ({ request }) => {
           expect(await request.json()).toEqual({
-            full_name: 'Mira Shah',
-            email: 'mira.shah@example.com',
+            full_name: 'Tirth Koradia',
+            email: 'tirth.koradia@example.com',
             password: 'Aretiva!Pass2026',
           })
           return HttpResponse.json(
             {
               id: '6dc4fa1b-8f6d-49a7-b65e-36ee0af42c4e',
-              full_name: 'Mira Shah',
-              email: 'mira.shah@example.com',
+              full_name: 'Tirth Koradia',
+              email: 'tirth.koradia@example.com',
               role: 'customer',
               created_at: '2026-10-24T00:00:00Z',
             },
@@ -40,10 +40,10 @@ describe('registration page', () => {
     )
     const { user } = renderApp('/register')
 
-    await user.type(screen.getByLabelText('Full name'), 'Mira Shah')
+    await user.type(screen.getByLabelText('Full name'), 'Tirth Koradia')
     await user.type(
       screen.getByLabelText('Email address'),
-      'mira.shah@example.com',
+      'tirth.koradia@example.com',
     )
     await user.type(screen.getByLabelText('Password'), 'Aretiva!Pass2026')
     await user.click(

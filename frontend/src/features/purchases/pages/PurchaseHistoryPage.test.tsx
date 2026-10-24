@@ -14,8 +14,8 @@ describe('purchase history page', () => {
         token_type: 'bearer',
         user: {
           id: '6dc4fa1b-8f6d-49a7-b65e-36ee0af42c4e',
-          full_name: 'Mira Shah',
-          email: 'mira.shah@example.com',
+          full_name: 'Tirth Koradia',
+          email: 'tirth.koradia@example.com',
           role: 'customer',
         },
       }),
@@ -63,8 +63,8 @@ describe('purchase history page', () => {
         token_type: 'bearer',
         user: {
           id: '6dc4fa1b-8f6d-49a7-b65e-36ee0af42c4e',
-          full_name: 'Mira Shah',
-          email: 'mira.shah@example.com',
+          full_name: 'Tirth Koradia',
+          email: 'tirth.koradia@example.com',
           role: 'customer',
         },
       }),
@@ -99,7 +99,7 @@ describe('purchase history page', () => {
 
     await user.click(receiptBtn)
     expect(await screen.findByText('Certificate of Acquisition')).toBeInTheDocument()
-    expect(screen.getByText('mira.shah@example.com')).toBeInTheDocument()
+    expect(screen.getByText('tirth.koradia@example.com')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Print document/i })).toBeInTheDocument()
   })
 })

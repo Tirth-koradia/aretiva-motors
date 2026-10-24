@@ -52,15 +52,15 @@ def test_customer_cannot_create_a_vehicle(
     registration_response = client.post(
         "/api/auth/register",
         json={
-            "full_name": "Mira Shah",
-            "email": "mira.shah@example.com",
+            "full_name": "Tirth Koradia",
+            "email": "tirth.koradia@example.com",
             "password": "Aretiva!Pass2026",
         },
     )
     login_response = client.post(
         "/api/auth/login",
         json={
-            "email": "mira.shah@example.com",
+            "email": "tirth.koradia@example.com",
             "password": "Aretiva!Pass2026",
         },
     )

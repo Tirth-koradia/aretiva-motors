@@ -24,7 +24,7 @@ export function ReviewerRoleSwitcher({
         navigate('/admin/inventory')
       } else {
         const session = await login({
-          email: 'mira.shah@example.com',
+          email: 'tirth.koradia@example.com',
           password: 'Customer1234!',
         })
         saveSession(session)

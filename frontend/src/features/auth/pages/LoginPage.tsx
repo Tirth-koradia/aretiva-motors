@@ -142,13 +142,13 @@ export function LoginPage() {
                 <button
                   className="border-ink/20 hover:border-brand hover:text-brand bg-canvas rounded-xs border p-2.5 text-left transition-colors cursor-pointer"
                   onClick={() => {
-                    setEmail('mira.shah@example.com')
+                    setEmail('tirth.koradia@example.com')
                     setPassword('Customer1234!')
                   }}
                   type="button"
                 >
                   <span className="text-ink block text-xs font-semibold">Customer Demo</span>
-                  <span className="text-ink/60 block text-[11px]">Mira Shah</span>
+                  <span className="text-ink/60 block text-[11px]">Tirth Koradia</span>
                 </button>
                 <button
                   className="border-ink/20 hover:border-brand hover:text-brand bg-canvas rounded-xs border p-2.5 text-left transition-colors cursor-pointer"
