@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 
+import heroCarImage from '../../../assets/hero-editorial-car.jpg'
+
 function AretivaMark() {
   return (
     <svg aria-hidden="true" className="h-9 w-9" fill="none" viewBox="0 0 40 40">
@@ -86,30 +88,39 @@ export function LandingPage() {
           aria-label="Aretiva collection preview"
           className="relative mx-auto w-full max-w-lg lg:mx-0"
         >
-          <div className="border-ink/15 bg-mist relative aspect-[4/5] overflow-hidden border p-5 sm:p-7">
-            <div className="from-brand to-ink relative h-full overflow-hidden bg-gradient-to-br">
-              <div
-                aria-hidden="true"
-                className="bg-canvas/10 absolute -top-[18%] -right-[28%] aspect-square w-[85%] rounded-full border border-white/20"
+          <Link
+            className="group focus-visible:ring-accent border-ink/15 bg-mist relative block aspect-[4/5] overflow-hidden border p-4 sm:p-6 transition-all duration-300 hover:border-brand/40 focus:outline-none focus-visible:ring-2"
+            to="/showroom"
+          >
+            <div className="relative h-full w-full overflow-hidden bg-ink">
+              <img
+                alt="Aretiva curated grand tourer in a modernist architectural pavilion"
+                className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                src={heroCarImage}
               />
-              <div
-                aria-hidden="true"
-                className="border-accent absolute top-[18%] right-[18%] aspect-square w-[54%] rotate-12 border"
-              />
-              <div className="absolute inset-x-0 bottom-0 p-7 text-white sm:p-9">
-                <p className="text-xs tracking-[0.24em] text-white/65 uppercase">
+              <div className="from-ink/95 via-ink/40 absolute inset-0 bg-gradient-to-t to-transparent" />
+
+              <div className="bg-ink/75 absolute top-4 right-4 sm:top-5 sm:right-5 flex items-center gap-2 rounded-full border border-white/20 px-3.5 py-1 text-[11px] font-medium tracking-wider text-white/90 backdrop-blur-md uppercase">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <span>Edition 01</span>
+              </div>
+
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
+                <p className="text-xs font-semibold tracking-[0.24em] text-white/70 uppercase">
                   The Verdigris Gallery
                 </p>
-                <p className="font-display mt-3 text-4xl leading-none">
-                  Edition 01
+                <p className="font-display mt-2 text-3xl sm:text-4xl leading-none tracking-tight">
+                  Featured Vehicle
                 </p>
-                <div className="mt-7 flex items-center justify-between border-t border-white/25 pt-4 text-xs tracking-wider text-white/70 uppercase">
+                <div className="mt-6 flex items-center justify-between border-t border-white/20 pt-4 text-xs tracking-wider text-white/80 uppercase">
                   <span>Verified collection</span>
-                  <span>2026</span>
+                  <span className="text-accent group-hover:translate-x-1 inline-flex items-center gap-1.5 font-semibold transition-transform">
+                    Explore showroom →
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
           <div
             aria-hidden="true"
             className="bg-accent absolute -right-4 -bottom-4 -z-10 h-28 w-28 sm:-right-7 sm:-bottom-7"
