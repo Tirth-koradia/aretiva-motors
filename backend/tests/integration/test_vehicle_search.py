@@ -102,4 +102,3 @@ def test_customer_can_filter_and_sort_active_inventory(
     )
     assert partial_response.status_code == 200
     assert partial_response.json()["meta"]["total"] == 2
-
