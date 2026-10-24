@@ -4,7 +4,7 @@
 
 Aretiva Motors is a full-stack vehicle showroom and inventory-management application built as an online internship assessment. The name combines *aretē* (excellence) with iteration — quality earned through continuous refinement.
 
-<!-- CI badge will activate once pushed to GitHub: ![CI](https://github.com/Tirth0245/aretiva-motors/actions/workflows/ci.yml/badge.svg) -->
+![CI](https://github.com/Tirth-koradia/aretiva-motors/actions/workflows/ci.yml/badge.svg)
 
 ---
 
