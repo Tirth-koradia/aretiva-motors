@@ -53,7 +53,15 @@ This document is intentionally maintained during development so another engineer
    - role-gated `/admin/inventory` screen lists live inventory and can restock a vehicle
    - administrator navigation is exposed from the showroom; restocking and confirmation-protected soft deletion are server-enforced
 13. Showroom refinement:
-   - text search, category, availability, sort order, and server-side pagination now call the constrained search endpoint
+14. Administrator vehicle create and edit controls:
+   - `AdminVehicleFormModal.tsx` provides full modal creation and editing with complete field validation matching `VehicleCreateRequest`.
+   - Wired to `+ Add new vehicle` and table row `Edit` actions on `/admin/inventory` with TanStack Query cache invalidation.
+15. Administrator activity and audit ledger:
+   - `GET /api/admin/activity` exposes a paginated, reverse-chronological transaction audit ledger based on append-only `InventoryTransaction` records.
+16. Containerization, CI, and port normalization:
+   - `backend/Dockerfile` and `frontend/Dockerfile` with Nginx reverse proxy routing `/api` to the backend.
+   - GitHub Actions CI (`.github/workflows/ci.yml`) runs Ruff, Pytest, ESLint, TypeScript typecheck, Vitest, and production build.
+   - Development ports normalized to standard 8000 (backend) and 5173 (frontend) with Vite proxy forwarding `/api` and `/health`.
 
 ## Important decisions
 
@@ -66,7 +74,7 @@ This document is intentionally maintained during development so another engineer
 - Purchasing exactly one unit will be atomic: conditional `UPDATE ... WHERE quantity >= 1`, transaction record in the same transaction, test concurrent final-item purchases against real PostgreSQL.
 - Zero-stock vehicles remain visible but cannot be purchased.
 - Customer purchases and administrator restocks must create immutable inventory transactions.
-- Use server-side filtering and pagination. The filters are server-backed already; a remaining polish item is mirroring them in the URL.
+- Use server-side filtering and pagination. The filters are server-backed already and mirrored in the URL.
 - Do not add real payments, carts, recommendations, or microservices until all assessment essentials are polished.
 
 ## Run locally
@@ -85,15 +93,7 @@ Backend:
 ```bash
 cd backend
 source .venv/bin/activate
-python -m pytest -q
-ruff check .
-ruff format --check .
-```
-
-The virtual environment was created at `backend/.venv`; install/reinstall dependencies with:
-
-```bash
-python -m pip install -e '.[dev]'
+uvicorn aretiva.main:app --port 8000 --reload
 ```
 
 Frontend:
@@ -101,10 +101,8 @@ Frontend:
 ```bash
 cd frontend
 npm install
-npm test
-npm run typecheck
-npm run lint
-npm run build
+npm run dev
+# Vite runs on http://localhost:5173, proxying /api to http://localhost:8000
 ```
 
 ## Current tests
@@ -129,14 +127,12 @@ Co-authored-by: OpenAI Codex <AI@users.noreply.github.com>
 
 Do not squash the history before submission. Do not place tokens, passwords, private URLs, or secrets in code, commit messages, `PROMPTS.md`, screenshots, or raw chat logs.
 
-## Immediate next work
+## Remaining submission steps
 
-1. Add the remaining administrator create/edit controls. The backend endpoints already exist: `POST /api/vehicles` and `PUT /api/vehicles/{id}`; deletion is now connected through the admin desk. Reuse `VehicleCreateRequest` field rules exactly; do not add a public admin-registration path. The current inventory page is `frontend/src/features/admin/pages/AdminInventoryPage.tsx` and the REST helpers belong in `features/showroom/api/vehiclesApi.ts` or a dedicated admin API module.
-2. Polish the showroom filters: mirror the selected filters and page in URL query parameters, then extend the existing server endpoint use with optional make, price, and year bounds. Keep the allowlisted sort values and never client-filter the inventory.
-3. Add an admin-only transaction/activity endpoint if useful for the dashboard; the ledger model is `InventoryTransaction` and must remain append-only.
-4. Add CI, backend/frontend Dockerfiles, and a safe seed workflow. Seed accounts must be disposable and documented; never commit real credentials. Capture mobile and desktop screenshots after browser QA.
-5. Before publishing: replace root `PROMPTS.md` placeholder with the required unedited AI-conversation evidence or a valid public share/export reference; finalize README including exact heading **My AI Usage** and `docs/test-report.md` with final counts.
-6. Ask the user for a GitHub repository URL only after core UI, docs, and screenshots are ready to publish. Then add `origin`, verify `git remote -v`, and push only with explicit confirmation. Do not request passwords/tokens in chat.
+1. Review and commit all verified changes using conventional commit messages with the Codex co-author trailer.
+2. Capture desktop and mobile screenshots for showroom, admin inventory, and vehicle detail views.
+3. Update `PROMPTS.md` with conversation links/exports before final submission.
+4. Prompt the user for the GitHub remote URL and push only after explicit confirmation.
 
 ## Key files
 

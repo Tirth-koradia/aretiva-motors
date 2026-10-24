@@ -4,7 +4,7 @@
 
 Aretiva Motors is a full-stack vehicle showroom and inventory-management application built as an online internship assessment. The name combines *aretē* (excellence) with iteration — quality earned through continuous refinement.
 
-![CI](https://github.com/Tirth0245/aretiva-motors/actions/workflows/ci.yml/badge.svg)
+<!-- CI badge will activate once pushed to GitHub: ![CI](https://github.com/Tirth0245/aretiva-motors/actions/workflows/ci.yml/badge.svg) -->
 
 ---
 
@@ -98,10 +98,10 @@ npm run dev
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | `admin@aretiva.test` | see `ADMIN_PASSWORD` in `.env` |
+| Admin | `admin@aretiva.com` | `ChangeMe123!` (or see `.env`) |
 | Customer | register at `/register` | any password ≥ 8 chars |
 
-> **Note**: The admin email is a disposable `.test` domain address. Real credentials are never committed.
+> **Note**: Disposable local demo credentials. Real credentials are never committed.
 
 ---
 
