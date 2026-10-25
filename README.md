@@ -21,7 +21,7 @@ Welcome to the Aretiva Motors assessment review! This project was engineered spe
 
 | Service | Link | Description |
 |---|---|---|
-| **Live Web Application** | [Aretiva Motors Production](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/) | Deployed on Vercel with edge caching & client SPA rewrites |
+| **Live Web Application** | [Aretiva Motors Production](https://aretiva-motors.vercel.app/) | Deployed on Vercel with edge caching & client SPA rewrites |
 | **Interactive API Docs** | [FastAPI Swagger UI](https://aretiva-backend.onrender.com/docs) | Live OpenAPI 3.1 documentation & interactive execution sandbox on Render |
 | **Production Health Probe** | [`GET /health`](https://aretiva-backend.onrender.com/health) | Uptime check returning database latency & system readiness |
 
@@ -59,7 +59,7 @@ To keep this README fast and uncluttered, all high-resolution captures are curat
 ### ⚡ 1-Click Reviewer Access & Demo Credentials
 
 To make testing instantaneous without copying and pasting passwords:
-1. Navigate to [`/login`](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/login).
+1. Navigate to [`/login`](https://aretiva-motors.vercel.app/login).
 2. Click either **Customer Demo** or **Admin Demo** in the **Reviewer Quick Access** panel to autofill verified credentials in 1 click.
 3. While authenticated, use the header **Reviewer Role Switcher** (`Reviewer: Switch to Admin ⇄` / `Reviewer: Switch to Customer ⇄`) to toggle roles on the fly without logging out!
 
@@ -73,13 +73,13 @@ To make testing instantaneous without copying and pasting passwords:
 ### ⏱️ Guided 3-Minute Reviewer Tour
 
 1. **Multi-Parameter Filter & Tolerant Search**:
-   - Go to [`/showroom`](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/showroom).
+   - Go to [`/showroom`](https://aretiva-motors.vercel.app/showroom).
    - Type `porsche` or `mercedes` in the make search input — matches tolerantly via case-insensitive `ILIKE` substrings.
    - Select body categories (e.g., `Coupe`, `SUV`) and adjust price or year intervals.
    - Notice the **Live Results Counter** (`Showing X vehicles matching your criteria`) and click any **Active Filter Chip** (`✕`) to dismiss individual filters instantly.
 
 2. **Side-by-Side Luxury Comparison Drawer & Modal**:
-   - In [`/showroom`](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/showroom), click **+ Compare** on 2 or 3 vehicle cards.
+   - In [`/showroom`](https://aretiva-motors.vercel.app/showroom), click **+ Compare** on 2 or 3 vehicle cards.
    - Notice the floating bottom comparison tray with vehicle badges and counter (`Compare (2/3)`).
    - Click **Compare Specifications** to open the full-screen museum-grade **Side-by-Side Specification Review** modal.
    - Evaluate silhouettes, acquisition prices, monthly investments (EMI), categories, powertrains, transmissions, and mileage side-by-side.
@@ -96,7 +96,7 @@ To make testing instantaneous without copying and pasting passwords:
    - Note that sold-out vehicles (e.g., *Lexus LC 500 Convertible*, quantity: 0) securely disable the acquisition button and display a **Sold Out** badge.
 
 5. **Concierge Delivery Lifecycle Tracker & Printable Receipt**:
-   - Go to **Your considerations** ([`/purchases`](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/purchases)).
+   - Go to **Your considerations** ([`/purchases`](https://aretiva-motors.vercel.app/purchases)).
    - Notice the bespoke **Concierge Delivery Lifecycle** tracker embedded in every acquired vehicle card.
    - Review the 4 white-glove stages (`Acquisition Confirmed` ➔ `Custom Detailing & White-Glove Inspection` ➔ `En Route to Private Suite` ➔ `Handover Ready`), GPS tracking reference (`AM-TRK-...`), estimated handover date, and click between stages to inspect specific protocols.
    - Click **Acquisition receipt** on any completed purchase to open the luxury **Certificate of Acquisition** modal and print document.
@@ -106,7 +106,7 @@ To make testing instantaneous without copying and pasting passwords:
    - Click it once — you are instantly logged into the Administrator account and redirected to the Inventory Desk!
 
 7. **Admin Operations & Low Stock Alerts**:
-   - In the **Inventory Desk** ([`/admin/inventory`](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/admin/inventory)), notice vehicles with 1 unit remaining display a prominent **Only 1 left!** warning badge.
+   - In the **Inventory Desk** ([`/admin/inventory`](https://aretiva-motors.vercel.app/admin/inventory)), notice vehicles with 1 unit remaining display a prominent **Only 1 left!** warning badge.
    - Click **Restock** on any vehicle to replenish units with instant ledger synchronization.
    - Click **+ Add new vehicle** to create fresh catalog inventory.
 
@@ -118,7 +118,7 @@ To make testing instantaneous without copying and pasting passwords:
    - Click the **Concierge Deliveries (Lifecycle)** tab.
    - Review active client deliveries, collector emails, deterministic tracking codes (`AM-TRK-...`), and dispatch stages.
    - Select any stage from the dropdown or click **Advance ➔** to progress the white-glove delivery protocol (`Acquisition Confirmed` ➔ `Custom Detailing` ➔ `En Route` ➔ `Handover Ready`).
-   - Use the header role switcher (`Reviewer: Switch to Customer ⇄`) and open **Your considerations** ([`/purchases`](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/purchases)) to see the customer tracker immediately reflect the updated stage in real time!
+   - Use the header role switcher (`Reviewer: Switch to Customer ⇄`) and open **Your considerations** ([`/purchases`](https://aretiva-motors.vercel.app/purchases)) to see the customer tracker immediately reflect the updated stage in real time!
 
 ---
 
