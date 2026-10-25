@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { ReviewerRoleSwitcher } from '../../auth/components/ReviewerRoleSwitcher'
 import { clearSession, readSession } from '../../auth/session'
+import { DeliveryLifecycleTracker } from '../components/DeliveryLifecycleTracker'
 import { getPurchaseHistory, type PurchaseHistoryItem } from '../api/purchasesApi'
 
 function formatPrice(price: string) {
@@ -120,36 +121,44 @@ export function PurchaseHistoryPage() {
           >
             {historyQuery.data.items.map((purchase) => (
               <article
-                className="border-ink/15 bg-mist grid gap-5 border p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-7"
+                className="border-ink/15 bg-mist border p-5 sm:p-7"
                 key={purchase.id}
               >
-                <div>
-                  <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
-                    Considered ·{' '}
-                    {new Intl.DateTimeFormat('en-IN', {
-                      dateStyle: 'medium',
-                    }).format(new Date(purchase.purchased_at))}
-                  </p>
-                  <h2 className="font-display mt-3 text-4xl tracking-[-0.03em]">
-                    {purchase.vehicle.make} {purchase.vehicle.model}
-                  </h2>
-                  <p className="text-ink/65 mt-2 text-sm">
-                    {purchase.vehicle.year} · one unit requested
-                  </p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+                  <div>
+                    <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
+                      Considered ·{' '}
+                      {new Intl.DateTimeFormat('en-IN', {
+                        dateStyle: 'medium',
+                      }).format(new Date(purchase.purchased_at))}
+                    </p>
+                    <h2 className="font-display mt-3 text-4xl tracking-[-0.03em]">
+                      {purchase.vehicle.make} {purchase.vehicle.model}
+                    </h2>
+                    <p className="text-ink/65 mt-2 text-sm">
+                      {purchase.vehicle.year} · one unit requested
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:items-end justify-between gap-3">
+                    <p className="font-display text-2xl">
+                      {formatPrice(purchase.vehicle.price)}
+                    </p>
+                    <button
+                      className="inline-flex items-center gap-1.5 rounded-xs border border-ink/20 bg-canvas px-3 py-1.5 text-xs font-semibold text-ink/80 hover:border-brand hover:text-brand transition-colors cursor-pointer"
+                      onClick={() => setSelectedReceipt(purchase)}
+                      type="button"
+                    >
+                      <span>Acquisition receipt</span>
+                      <span aria-hidden="true">↗</span>
+                    </button>
+                  </div>
                 </div>
-                <div className="flex flex-col sm:items-end justify-between gap-3">
-                  <p className="font-display text-2xl">
-                    {formatPrice(purchase.vehicle.price)}
-                  </p>
-                  <button
-                    className="inline-flex items-center gap-1.5 rounded-xs border border-ink/20 bg-canvas px-3 py-1.5 text-xs font-semibold text-ink/80 hover:border-brand hover:text-brand transition-colors cursor-pointer"
-                    onClick={() => setSelectedReceipt(purchase)}
-                    type="button"
-                  >
-                    <span>Acquisition receipt</span>
-                    <span aria-hidden="true">↗</span>
-                  </button>
-                </div>
+
+                <DeliveryLifecycleTracker
+                  purchaseId={purchase.id}
+                  purchasedAt={purchase.purchased_at}
+                  vehicleName={`${purchase.vehicle.make} ${purchase.vehicle.model}`}
+                />
               </article>
             ))}
           </section>

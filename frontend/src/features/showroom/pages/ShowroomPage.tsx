@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { ReviewerRoleSwitcher } from '../../auth/components/ReviewerRoleSwitcher'
 import { clearSession, readSession } from '../../auth/session'
+import { VehicleComparisonModal } from '../components/VehicleComparisonModal'
 import { getVehicles, type Vehicle, type VehicleSearchFilters } from '../api/vehiclesApi'
 
 function formatPrice(price: string) {
@@ -17,11 +18,21 @@ function formatKilometres(distance: number) {
   return new Intl.NumberFormat('en-IN').format(distance)
 }
 
-function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
+function VehicleCard({
+  vehicle,
+  isSelectedForCompare,
+  onToggleCompare,
+  canSelectMore,
+}: {
+  vehicle: Vehicle
+  isSelectedForCompare: boolean
+  onToggleCompare: (vehicle: Vehicle) => void
+  canSelectMore: boolean
+}) {
   const condition = vehicle.condition === 'pre_owned' ? 'Pre-owned' : 'New'
 
   return (
-    <article className="border-ink/15 bg-canvas group overflow-hidden border transition-shadow hover:shadow-[8px_8px_0_var(--accent-gallery)]">
+    <article className="border-ink/15 bg-canvas group overflow-hidden border transition-shadow hover:shadow-[8px_8px_0_var(--accent-gallery)] flex flex-col justify-between">
       <div className="bg-mist relative aspect-[1.45/1] overflow-hidden p-5">
         {vehicle.image_url ? (
           <img
@@ -52,41 +63,60 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         <span className="bg-canvas text-ink absolute top-4 left-4 px-3 py-1 text-[0.68rem] font-semibold tracking-[0.14em] uppercase">
           {condition}
         </span>
-      </div>
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
-              {vehicle.year} · {vehicle.category}
-            </p>
-            <h2 className="font-display mt-2 text-3xl leading-none tracking-[-0.025em]">
-              {vehicle.make} {vehicle.model}
-            </h2>
-          </div>
-          <p className="font-display text-xl whitespace-nowrap">
-            {formatPrice(vehicle.price)}
-          </p>
-        </div>
-        <dl className="text-ink/65 border-ink/15 mt-6 grid grid-cols-3 border-t border-b py-3 text-xs">
-          <div>
-            <dt className="sr-only">Mileage</dt>
-            <dd>{formatKilometres(vehicle.mileage_km)} km</dd>
-          </div>
-          <div>
-            <dt className="sr-only">Fuel type</dt>
-            <dd className="capitalize">{vehicle.fuel_type}</dd>
-          </div>
-          <div>
-            <dt className="sr-only">Transmission</dt>
-            <dd className="capitalize">{vehicle.transmission}</dd>
-          </div>
-        </dl>
-        <Link
-          className="text-brand decoration-accent mt-5 inline-flex items-center gap-2 text-sm font-semibold underline underline-offset-4"
-          to={`/showroom/${vehicle.id}`}
+        <button
+          aria-label={isSelectedForCompare ? `Remove ${vehicle.make} ${vehicle.model} from comparison` : `Compare ${vehicle.make} ${vehicle.model}`}
+          aria-pressed={isSelectedForCompare}
+          disabled={!isSelectedForCompare && !canSelectMore}
+          onClick={() => onToggleCompare(vehicle)}
+          className={`absolute top-4 right-4 z-10 px-2.5 py-1 text-[0.68rem] font-semibold tracking-wider uppercase rounded-xs transition-all cursor-pointer ${
+            isSelectedForCompare
+              ? 'bg-ink text-canvas shadow-md'
+              : 'bg-canvas/90 text-ink/75 hover:bg-canvas hover:text-ink backdrop-blur-xs'
+          } ${!isSelectedForCompare && !canSelectMore ? 'opacity-40 cursor-not-allowed' : ''}`}
+          type="button"
         >
-          Consider this vehicle <span aria-hidden="true">→</span>
-        </Link>
+          {isSelectedForCompare ? '✓ Compared' : '+ Compare'}
+        </button>
+      </div>
+      <div className="p-5 flex-1 flex flex-col justify-between">
+        <div>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-brand text-xs font-semibold tracking-[0.16em] uppercase">
+                {vehicle.year} · {vehicle.category}
+              </p>
+              <h2 className="font-display mt-2 text-3xl leading-none tracking-[-0.025em]">
+                {vehicle.make} {vehicle.model}
+              </h2>
+            </div>
+            <p className="font-display text-xl whitespace-nowrap">
+              {formatPrice(vehicle.price)}
+            </p>
+          </div>
+          <dl className="text-ink/65 border-ink/15 mt-6 grid grid-cols-3 border-t border-b py-3 text-xs">
+            <div>
+              <dt className="sr-only">Mileage</dt>
+              <dd>{formatKilometres(vehicle.mileage_km)} km</dd>
+            </div>
+            <div>
+              <dt className="sr-only">Fuel type</dt>
+              <dd className="capitalize">{vehicle.fuel_type}</dd>
+            </div>
+            <div>
+              <dt className="sr-only">Transmission</dt>
+              <dd className="capitalize">{vehicle.transmission}</dd>
+            </div>
+          </dl>
+        </div>
+        <div className="mt-5 border-t border-ink/10 pt-3">
+          <Link
+            className="text-brand decoration-accent inline-flex items-center gap-1.5 text-xs font-semibold underline underline-offset-4"
+            to={`/showroom/${vehicle.id}`}
+          >
+            <span>Consider vehicle</span>
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </div>
     </article>
   )
@@ -111,6 +141,22 @@ export function ShowroomPage() {
     min_year: number;
     max_year: number;
   };
+
+  const [selectedVehicles, setSelectedVehicles] = useState<Vehicle[]>([])
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false)
+
+  const handleToggleCompare = (vehicle: Vehicle) => {
+    setSelectedVehicles((prev) => {
+      const exists = prev.some((v) => v.id === vehicle.id)
+      if (exists) {
+        return prev.filter((v) => v.id !== vehicle.id)
+      }
+      if (prev.length >= 3) {
+        return prev
+      }
+      return [...prev, vehicle]
+    })
+  }
 
   const [filters, setFilters] = useState<ShowroomFilters>({
     query: searchParams.get('query') ?? '',
@@ -593,7 +639,13 @@ export function ShowroomPage() {
               className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3"
             >
               {vehiclesQuery.data.items.map((vehicle) => (
-                <VehicleCard key={vehicle.id} vehicle={vehicle} />
+                <VehicleCard
+                  key={vehicle.id}
+                  vehicle={vehicle}
+                  isSelectedForCompare={selectedVehicles.some((v) => v.id === vehicle.id)}
+                  onToggleCompare={handleToggleCompare}
+                  canSelectMore={selectedVehicles.length < 3}
+                />
               ))}
             </section>
             {vehiclesQuery.data.meta.total_pages > 1 ? (
@@ -641,6 +693,71 @@ export function ShowroomPage() {
           </>
         ) : null}
       </main>
+
+      {/* Floating comparison tray */}
+      {selectedVehicles.length > 0 ? (
+        <aside
+          aria-label="Vehicle comparison tray"
+          className="fixed bottom-6 inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-40 bg-ink/95 text-canvas backdrop-blur-md rounded-full px-5 py-3 shadow-2xl border border-canvas/20 flex items-center justify-between gap-4 max-w-2xl w-full"
+        >
+          <div className="flex items-center gap-3">
+            <span className="font-display text-sm sm:text-base tracking-tight text-canvas">
+              Compare ({selectedVehicles.length}/3)
+            </span>
+            <div className="hidden sm:flex items-center gap-2">
+              {selectedVehicles.map((v) => (
+                <span
+                  key={v.id}
+                  className="inline-flex items-center gap-1.5 bg-canvas/15 text-canvas text-xs px-2.5 py-0.5 rounded-full font-medium"
+                >
+                  <span className="truncate max-w-[120px]">{v.make} {v.model}</span>
+                  <button
+                    aria-label={`Remove ${v.make} ${v.model}`}
+                    className="hover:text-accent font-bold cursor-pointer text-xs"
+                    onClick={() => handleToggleCompare(v)}
+                    type="button"
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              className="text-canvas/60 hover:text-canvas text-xs font-semibold underline underline-offset-4 cursor-pointer"
+              onClick={() => setSelectedVehicles([])}
+              type="button"
+            >
+              Clear
+            </button>
+            <button
+              className={`min-h-9 px-4 text-xs font-semibold uppercase tracking-wider rounded-full transition-colors cursor-pointer ${
+                selectedVehicles.length >= 2
+                  ? 'bg-canvas text-ink hover:bg-mist'
+                  : 'bg-canvas/25 text-canvas/40 cursor-not-allowed'
+              }`}
+              disabled={selectedVehicles.length < 2}
+              onClick={() => setIsComparisonOpen(true)}
+              type="button"
+            >
+              Compare Specifications
+            </button>
+          </div>
+        </aside>
+      ) : null}
+
+      <VehicleComparisonModal
+        isOpen={isComparisonOpen}
+        onClose={() => setIsComparisonOpen(false)}
+        vehicles={selectedVehicles}
+        onRemoveVehicle={(id) => setSelectedVehicles((prev) => prev.filter((v) => v.id !== id))}
+        onClearAll={() => {
+          setSelectedVehicles([])
+          setIsComparisonOpen(false)
+        }}
+      />
     </div>
   )
 }

@@ -57,32 +57,39 @@ To make testing instantaneous without copying and pasting passwords:
    - Select body categories (e.g., `Coupe`, `SUV`) and adjust price or year intervals.
    - Notice the **Live Results Counter** (`Showing X vehicles matching your criteria`) and click any **Active Filter Chip** (`✕`) to dismiss individual filters instantly.
 
-2. **Bespoke Acquisition Financing & EMI Estimator**:
+2. **Side-by-Side Luxury Comparison Drawer & Modal**:
+   - In [`/showroom`](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/showroom), click **+ Compare** on 2 or 3 vehicle cards.
+   - Notice the floating bottom comparison tray with vehicle badges and counter (`Compare (2/3)`).
+   - Click **Compare Specifications** to open the full-screen museum-grade **Side-by-Side Specification Review** modal.
+   - Evaluate silhouettes, acquisition prices, monthly investments (EMI), categories, powertrains, transmissions, and mileage side-by-side.
+
+3. **Bespoke Acquisition Financing & EMI Estimator**:
    - Open any available vehicle (e.g., *Porsche 911 GT3* or *Aston Martin Vantage*).
    - Scroll down to the **Financing & EMI Estimator** widget.
    - Toggle between **20%**, **30%**, and **50%** down payment presets and adjust loan tenures (**36**, **48**, or **60 mos**).
    - Observe the live monthly investment calculate in real time using standard financial amortization formulas at 8.5% APR.
 
-3. **Atomic Purchase & Concurrency Guard**:
+4. **Atomic Purchase & Concurrency Guard**:
    - Click **Acquire vehicle**. The transaction commits atomically.
    - Inventory decrements in real time with pessimistic database locking (`SELECT ... FOR UPDATE`), preventing overselling during concurrent acquisitions.
    - Note that sold-out vehicles (e.g., *Lexus LC 500 Convertible*, quantity: 0) securely disable the acquisition button and display a **Sold Out** badge.
 
-4. **Printable Acquisition Certificate**:
+5. **Concierge Delivery Lifecycle Tracker & Printable Receipt**:
    - Go to **Your considerations** ([`/purchases`](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/purchases)).
-   - Click **Acquisition receipt** on any completed purchase.
-   - View the luxury **Certificate of Acquisition** modal and click **Print document** to see the clean, print-optimized document preview.
+   - Notice the bespoke **Concierge Delivery Lifecycle** tracker embedded in every acquired vehicle card.
+   - Review the 4 white-glove stages (`Acquisition Confirmed` ➔ `Custom Detailing & White-Glove Inspection` ➔ `En Route to Private Suite` ➔ `Handover Ready`), GPS tracking reference (`AM-TRK-...`), estimated handover date, and click between stages to inspect specific protocols.
+   - Click **Acquisition receipt** on any completed purchase to open the luxury **Certificate of Acquisition** modal and print document.
 
-5. **Instant Reviewer Role Switcher**:
+6. **Instant Reviewer Role Switcher**:
    - Notice the top header button: `Reviewer: Switch to Admin ⇄`.
    - Click it once — you are instantly logged into the Administrator account and redirected to the Inventory Desk!
 
-6. **Admin Operations & Low Stock Alerts**:
+7. **Admin Operations & Low Stock Alerts**:
    - In the **Inventory Desk** ([`/admin/inventory`](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/admin/inventory)), notice vehicles with 1 unit remaining display a prominent **Only 1 left!** warning badge.
    - Click **Restock** on any vehicle to replenish units with instant ledger synchronization.
    - Click **+ Add new vehicle** to create fresh catalog inventory.
 
-7. **Live Admin Activity & Transaction Ledger**:
+8. **Live Admin Activity & Transaction Ledger**:
    - Click the **Activity & Transaction Ledger** tab next to Fleet Inventory.
    - Inspect the real-time audit trail recording every purchase and restock event with timestamp, vehicle model, quantity delta (`1 ➔ 0`), and collector email.
 
@@ -124,7 +131,7 @@ Development followed a disciplined **Red → Green → Refactor** TDD workflow. 
 # Backend test suite (20 integration & concurrency tests)
 cd backend && .venv/bin/pytest -q
 
-# Frontend test suite (13 Vitest interaction & component tests)
+# Frontend test suite (15 Vitest interaction & component tests)
 cd frontend && npm test -- --run
 ```
 
