@@ -1,9 +1,12 @@
 import type { LoginResult } from '../../auth/api/authApi'
 
+export type DeliveryStatus = 'confirmed' | 'detailing' | 'en_route' | 'handover_ready'
+
 export type PurchaseHistoryItem = {
   id: string
   quantity: number
   purchased_at: string
+  delivery_status?: DeliveryStatus
   vehicle: {
     id: string
     make: string

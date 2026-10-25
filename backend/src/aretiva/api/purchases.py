@@ -39,6 +39,7 @@ async def list_purchases(
                 id=transaction.id,
                 quantity=abs(transaction.quantity_delta),
                 purchased_at=transaction.created_at,
+                delivery_status=transaction.delivery_status,
                 vehicle=PurchasedVehicleSummary(
                     id=vehicle.id,
                     make=vehicle.make,

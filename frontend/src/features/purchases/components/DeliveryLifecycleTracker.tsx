@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface DeliveryStage {
   id: string
@@ -38,26 +38,41 @@ interface DeliveryLifecycleTrackerProps {
   purchaseId: string
   purchasedAt: string
   vehicleName: string
+  currentStageId?: 'confirmed' | 'detailing' | 'en_route' | 'handover_ready' | undefined
 }
 
 export function DeliveryLifecycleTracker({
   purchaseId,
   purchasedAt,
   vehicleName,
+  currentStageId,
 }: DeliveryLifecycleTrackerProps) {
-  // Determine realistic default stage based on purchase age, default to Detailing (stage index 1)
+  // Determine stage based on admin-configured status or purchase age
   const purchaseDate = new Date(purchasedAt)
   const daysSincePurchase = Math.max(
     0,
     Math.floor((Date.now() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24))
   )
 
-  const defaultStageIndex = Math.min(
-    DELIVERY_STAGES.length - 1,
-    daysSincePurchase < 1 ? 0 : daysSincePurchase < 3 ? 1 : daysSincePurchase < 6 ? 2 : 3
-  )
+  const explicitStageIndex = currentStageId
+    ? DELIVERY_STAGES.findIndex((s) => s.id === currentStageId)
+    : -1
+
+  const defaultStageIndex = explicitStageIndex >= 0
+    ? explicitStageIndex
+    : Math.min(
+        DELIVERY_STAGES.length - 1,
+        daysSincePurchase < 1 ? 0 : daysSincePurchase < 3 ? 1 : daysSincePurchase < 6 ? 2 : 3
+      )
 
   const [activeStageIndex, setActiveStageIndex] = useState(defaultStageIndex)
+
+  useEffect(() => {
+    if (explicitStageIndex >= 0) {
+      setActiveStageIndex(explicitStageIndex)
+    }
+  }, [explicitStageIndex])
+
   const currentStage: DeliveryStage = DELIVERY_STAGES[activeStageIndex] ?? DELIVERY_STAGES[0]!
 
   // Estimated delivery: 7 days after purchase date

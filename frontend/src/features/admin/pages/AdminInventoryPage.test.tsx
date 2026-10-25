@@ -125,4 +125,90 @@ describe('administrator inventory desk', () => {
     expect(screen.getByText('-1 unit')).toBeInTheDocument()
     expect(screen.getByText('Purchase')).toBeInTheDocument()
   })
+
+  it('switches to concierge deliveries tab and updates a delivery lifecycle stage', async () => {
+    window.localStorage.setItem(
+      'aretiva.session',
+      JSON.stringify({
+        access_token: 'admin-access-token',
+        token_type: 'bearer',
+        user: {
+          id: '6dc4fa1b-8f6d-49a7-b65e-36ee0af42c4e',
+          full_name: 'Aretiva Administrator',
+          email: 'admin@aretiva.test',
+          role: 'admin',
+        },
+      }),
+    )
+
+    const deliveryId = 'd1111111-1234-5678-90ab-cdef12345678'
+    server.use(
+      http.get('http://localhost:8000/api/vehicles', () =>
+        HttpResponse.json({
+          items: [],
+          meta: { page: 1, page_size: 12, total: 0, total_pages: 0 },
+        }),
+      ),
+      http.get('http://localhost:8000/api/admin/deliveries', () =>
+        HttpResponse.json({
+          items: [
+            {
+              id: deliveryId,
+              created_at: '2026-10-25T01:00:00Z',
+              delivery_status: 'confirmed',
+              customer_id: 'customer-uuid',
+              customer_name: 'Tirth Koradia',
+              customer_email: 'tirth.koradia@example.com',
+              vehicle_id: '2fcfe17b-fb81-4c89-a5c4-d63fd1dd6baa',
+              vehicle_make: 'Porsche',
+              vehicle_model: '911 GT3 (992)',
+              vehicle_year: 2024,
+              vehicle_price: '27500000.00',
+              vehicle_image_url: null,
+            },
+          ],
+          meta: { page: 1, page_size: 20, total: 1, total_pages: 1 },
+        }),
+      ),
+      http.patch(
+        `http://localhost:8000/api/admin/deliveries/${deliveryId}`,
+        async ({ request }) => {
+          const body = (await request.json()) as { delivery_status: string }
+          expect(body.delivery_status).toBe('detailing')
+          return HttpResponse.json({
+            id: deliveryId,
+            created_at: '2026-10-25T01:00:00Z',
+            delivery_status: 'detailing',
+            customer_id: 'customer-uuid',
+            customer_name: 'Tirth Koradia',
+            customer_email: 'tirth.koradia@example.com',
+            vehicle_id: '2fcfe17b-fb81-4c89-a5c4-d63fd1dd6baa',
+            vehicle_make: 'Porsche',
+            vehicle_model: '911 GT3 (992)',
+            vehicle_year: 2024,
+            vehicle_price: '27500000.00',
+            vehicle_image_url: null,
+          })
+        },
+      ),
+    )
+
+    const { user } = renderApp('/admin/inventory')
+
+    const deliveriesTabBtn = await screen.findByRole('button', { name: /Concierge Deliveries/i })
+    expect(deliveriesTabBtn).toBeInTheDocument()
+
+    await user.click(deliveriesTabBtn)
+
+    expect(await screen.findByText('Concierge Delivery Management')).toBeInTheDocument()
+    expect(screen.getByText(/AM-TRK-D1111111/i)).toBeInTheDocument()
+    expect(screen.getByText('Tirth Koradia')).toBeInTheDocument()
+    expect(screen.getByText(/Porsche 911 GT3 \(992\)/i)).toBeInTheDocument()
+
+    // Advance to next stage (detailing)
+    const advanceBtn = screen.getByRole('button', { name: /Advance order d1111111 to next stage/i })
+    await user.click(advanceBtn)
+
+    expect(await screen.findByRole('status')).toHaveTextContent(/advanced to Custom Detailing/i)
+  })
 })

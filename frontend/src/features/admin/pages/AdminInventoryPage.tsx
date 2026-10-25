@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { ReviewerRoleSwitcher } from '../../auth/components/ReviewerRoleSwitcher'
 import { clearSession, readSession } from '../../auth/session'
 import { deleteVehicle, getVehicles, restockVehicle } from '../../showroom/api/vehiclesApi'
-import { getActivity } from '../api/adminApi'
+import { getActivity, getDeliveries, updateDeliveryStatus, type DeliveryItem } from '../api/adminApi'
 import AdminVehicleFormModal from '../components/AdminVehicleFormModal'
 import { Vehicle } from '../../showroom/api/vehiclesApi'
 
@@ -17,11 +17,25 @@ function formatPrice(price: string) {
   }).format(Number(price))
 }
 
+const STAGE_LABELS: Record<string, string> = {
+  confirmed: 'Acquisition Confirmed',
+  detailing: 'Custom Detailing & White-Glove Inspection',
+  en_route: 'En Route to Private Suite',
+  handover_ready: 'Handover Ready',
+}
+
+const NEXT_STAGE: Record<string, 'confirmed' | 'detailing' | 'en_route' | 'handover_ready' | null> = {
+  confirmed: 'detailing',
+  detailing: 'en_route',
+  en_route: 'handover_ready',
+  handover_ready: null,
+}
+
 export function AdminInventoryPage() {
   const session = readSession()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const [activeTab, setActiveTab] = useState<'inventory' | 'activity'>('inventory')
+  const [activeTab, setActiveTab] = useState<'inventory' | 'activity' | 'deliveries'>('inventory')
 
   const handleSignOut = () => {
     clearSession()
@@ -36,6 +50,35 @@ export function AdminInventoryPage() {
     queryKey: ['admin', 'activity'],
     queryFn: () => getActivity(session!),
     enabled: session?.user.role === 'admin' && activeTab === 'activity',
+  })
+  const deliveriesQuery = useQuery({
+    queryKey: ['admin', 'deliveries'],
+    queryFn: () => getDeliveries(session!),
+    enabled: session?.user.role === 'admin' && activeTab === 'deliveries',
+  })
+  const [updatingDeliveryId, setUpdatingDeliveryId] = useState<string | null>(null)
+  const [deliveryFeedback, setDeliveryFeedback] = useState<string | null>(null)
+
+  const updateDeliveryMutation = useMutation({
+    mutationFn: ({
+      transactionId,
+      deliveryStatus,
+    }: {
+      transactionId: string
+      deliveryStatus: 'confirmed' | 'detailing' | 'en_route' | 'handover_ready'
+    }) => {
+      setUpdatingDeliveryId(transactionId)
+      return updateDeliveryStatus(session!, transactionId, deliveryStatus)
+    },
+    onSuccess: (updated: DeliveryItem) => {
+      setUpdatingDeliveryId(null)
+      setDeliveryFeedback(`Order ${updated.id.slice(0, 8)} advanced to ${STAGE_LABELS[updated.delivery_status]}`)
+      queryClient.invalidateQueries({ queryKey: ['admin', 'deliveries'] })
+      queryClient.invalidateQueries({ queryKey: ['purchases'] })
+    },
+    onError: () => {
+      setUpdatingDeliveryId(null)
+    },
   })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
@@ -163,6 +206,20 @@ export function AdminInventoryPage() {
               Audit
             </span>
           </button>
+          <button
+            className={`border-b-2 px-6 py-3 text-sm font-semibold transition-colors cursor-pointer flex items-center gap-2 ${
+              activeTab === 'deliveries'
+                ? 'border-brand text-brand'
+                : 'border-transparent text-ink/60 hover:text-ink'
+            }`}
+            onClick={() => setActiveTab('deliveries')}
+            type="button"
+          >
+            <span>Concierge Deliveries</span>
+            <span className="bg-amber-500/15 text-amber-900 rounded-full px-2 py-0.5 text-xs font-bold">
+              Lifecycle
+            </span>
+          </button>
         </div>
 
         {activeTab === 'activity' ? (
@@ -235,6 +292,164 @@ export function AdminInventoryPage() {
                             dateStyle: 'medium',
                             timeStyle: 'short',
                           }).format(new Date(item.created_at))}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : null}
+          </div>
+        ) : activeTab === 'deliveries' ? (
+          <div className="mt-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="font-display text-2xl tracking-tight">
+                  Concierge Delivery Management
+                </h2>
+                <p className="text-ink/65 text-xs mt-1">
+                  Control and advance the white-glove delivery lifecycle stages for all acquired collector vehicles.
+                </p>
+              </div>
+            </div>
+
+            {deliveryFeedback ? (
+              <div
+                className="border-brand bg-mist mt-6 border p-4 text-xs font-semibold text-brand flex items-center justify-between"
+                role="status"
+              >
+                <span>✓ {deliveryFeedback}</span>
+                <button
+                  className="text-ink/50 hover:text-ink text-sm font-bold p-1 cursor-pointer"
+                  onClick={() => setDeliveryFeedback(null)}
+                  type="button"
+                >
+                  ✕
+                </button>
+              </div>
+            ) : null}
+
+            {deliveriesQuery.isPending ? (
+              <p className="text-ink/65 mt-6">Loading delivery dispatches…</p>
+            ) : null}
+            {deliveriesQuery.isError ? (
+              <p
+                className="border-accent bg-accent/10 mt-6 border px-4 py-3 text-sm"
+                role="alert"
+              >
+                {deliveriesQuery.error.message}
+              </p>
+            ) : null}
+            {deliveriesQuery.data && deliveriesQuery.data.items.length === 0 ? (
+              <div className="border-ink/15 mt-6 border py-12 text-center bg-mist">
+                <p className="font-display text-2xl">No acquisitions dispatched yet.</p>
+                <p className="text-ink/60 text-xs mt-2">
+                  When customers acquire vehicles from the showroom, their concierge delivery records will appear here for stage advancement.
+                </p>
+              </div>
+            ) : null}
+            {deliveriesQuery.data && deliveriesQuery.data.items.length > 0 ? (
+              <div className="border-ink/15 mt-6 overflow-x-auto border">
+                <table className="w-full min-w-[840px] border-collapse text-left">
+                  <caption className="sr-only">Concierge delivery lifecycle management ledger</caption>
+                  <thead className="bg-mist text-xs tracking-[0.12em] uppercase">
+                    <tr>
+                      <th className="px-5 py-4 font-semibold">Dispatch Tracking</th>
+                      <th className="px-5 py-4 font-semibold">Collector</th>
+                      <th className="px-5 py-4 font-semibold">Motorcar</th>
+                      <th className="px-5 py-4 font-semibold">Current Protocol Stage</th>
+                      <th className="px-5 py-4 font-semibold">Lifecycle Stage Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {deliveriesQuery.data.items.map((delivery) => (
+                      <tr className="border-ink/15 border-t" key={delivery.id}>
+                        <td className="px-5 py-4 align-top">
+                          <span className="font-mono text-xs font-bold text-brand block">
+                            AM-TRK-{delivery.id.replace(/-/g, '').slice(0, 8).toUpperCase()}
+                          </span>
+                          <span className="text-ink/50 text-[11px] block mt-0.5">
+                            {new Intl.DateTimeFormat('en-IN', {
+                              dateStyle: 'medium',
+                            }).format(new Date(delivery.created_at))}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 align-top">
+                          <span className="font-semibold text-xs block text-ink">
+                            {delivery.customer_name ?? 'Private Client'}
+                          </span>
+                          <span className="text-ink/60 text-xs block font-mono">
+                            {delivery.customer_email ?? 'Registry ID: ' + (delivery.customer_id?.slice(0, 8) ?? 'N/A')}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 align-top">
+                          <span className="font-display text-sm font-medium text-ink block">
+                            {delivery.vehicle_year} {delivery.vehicle_make} {delivery.vehicle_model}
+                          </span>
+                          <span className="text-brand font-semibold text-xs block mt-0.5">
+                            {formatPrice(delivery.vehicle_price)}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 align-top">
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                              delivery.delivery_status === 'handover_ready'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                : delivery.delivery_status === 'en_route'
+                                ? 'bg-amber-50 text-amber-900 border-amber-300'
+                                : delivery.delivery_status === 'detailing'
+                                ? 'bg-blue-50 text-blue-900 border-blue-300'
+                                : 'bg-slate-100 text-slate-800 border-slate-300'
+                            }`}
+                          >
+                            <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
+                            {STAGE_LABELS[delivery.delivery_status] ?? delivery.delivery_status}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 align-top">
+                          <div className="flex items-center gap-2">
+                            <select
+                              aria-label={`Update lifecycle stage for order ${delivery.id.slice(0, 8)}`}
+                              className="border-ink/20 focus:border-brand focus:ring-brand/20 bg-white px-2.5 py-1.5 text-xs font-semibold rounded-xs outline-none cursor-pointer"
+                              disabled={updateDeliveryMutation.isPending && updatingDeliveryId === delivery.id}
+                              onChange={(e) => {
+                                updateDeliveryMutation.mutate({
+                                  transactionId: delivery.id,
+                                  deliveryStatus: e.target.value as
+                                    | 'confirmed'
+                                    | 'detailing'
+                                    | 'en_route'
+                                    | 'handover_ready',
+                                })
+                              }}
+                              value={delivery.delivery_status}
+                            >
+                              <option value="confirmed">1. Acquisition Confirmed</option>
+                              <option value="detailing">2. Custom Detailing & Audit</option>
+                              <option value="en_route">3. En Route to Private Suite</option>
+                              <option value="handover_ready">4. Handover Ready</option>
+                            </select>
+
+                            {NEXT_STAGE[delivery.delivery_status] ? (
+                              <button
+                                aria-label={`Advance order ${delivery.id.slice(0, 8)} to next stage`}
+                                className="text-xs font-semibold bg-brand text-canvas hover:bg-ink px-3 py-1.5 rounded-xs transition-colors cursor-pointer whitespace-nowrap"
+                                disabled={updateDeliveryMutation.isPending && updatingDeliveryId === delivery.id}
+                                onClick={() => {
+                                  const next = NEXT_STAGE[delivery.delivery_status]
+                                  if (next) {
+                                    updateDeliveryMutation.mutate({
+                                      transactionId: delivery.id,
+                                      deliveryStatus: next,
+                                    })
+                                  }
+                                }}
+                                type="button"
+                              >
+                                Advance ➔
+                              </button>
+                            ) : null}
+                          </div>
                         </td>
                       </tr>
                     ))}

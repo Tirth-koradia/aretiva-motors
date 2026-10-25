@@ -42,3 +42,69 @@ export async function getActivity(
   }
   return response.json()
 }
+
+export type DeliveryItem = {
+  id: string
+  created_at: string
+  delivery_status: 'confirmed' | 'detailing' | 'en_route' | 'handover_ready'
+  customer_id: string | null
+  customer_name: string | null
+  customer_email: string | null
+  vehicle_id: string
+  vehicle_make: string
+  vehicle_model: string
+  vehicle_year: number
+  vehicle_price: string
+  vehicle_image_url: string | null
+}
+
+export type DeliveryPage = {
+  items: DeliveryItem[]
+  meta: {
+    page: number
+    page_size: number
+    total: number
+    total_pages: number
+  }
+}
+
+export async function getDeliveries(
+  session: LoginResult,
+  page = 1,
+  pageSize = 20,
+): Promise<DeliveryPage> {
+  const apiBaseUrl = getApiBaseUrl()
+  const response = await fetch(
+    `${apiBaseUrl}/admin/deliveries?page=${page}&page_size=${pageSize}`,
+    {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    },
+  )
+  if (!response.ok) {
+    throw new Error('Failed to load concierge deliveries.')
+  }
+  return response.json()
+}
+
+export async function updateDeliveryStatus(
+  session: LoginResult,
+  transactionId: string,
+  deliveryStatus: 'confirmed' | 'detailing' | 'en_route' | 'handover_ready',
+): Promise<DeliveryItem> {
+  const apiBaseUrl = getApiBaseUrl()
+  const response = await fetch(
+    `${apiBaseUrl}/admin/deliveries/${transactionId}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ delivery_status: deliveryStatus }),
+    },
+  )
+  if (!response.ok) {
+    throw new Error('Failed to update delivery lifecycle status.')
+  }
+  return response.json()
+}

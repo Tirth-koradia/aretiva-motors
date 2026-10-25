@@ -123,6 +123,7 @@ class PurchaseHistoryItem(BaseModel):
     id: UUID
     quantity: int
     purchased_at: datetime
+    delivery_status: str = "confirmed"
     vehicle: PurchasedVehicleSummary
 
 

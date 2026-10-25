@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import StrEnum
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, DateTime, Enum, ForeignKey, Integer, func
+from sqlalchemy import CheckConstraint, DateTime, Enum, ForeignKey, Integer, String, func
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -51,4 +51,10 @@ class InventoryTransaction(Base):
     quantity_delta: Mapped[int] = mapped_column(Integer)
     quantity_before: Mapped[int] = mapped_column(Integer)
     quantity_after: Mapped[int] = mapped_column(Integer)
+    delivery_status: Mapped[str] = mapped_column(
+        String(50),
+        default="confirmed",
+        server_default="confirmed",
+        nullable=False,
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

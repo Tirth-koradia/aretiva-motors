@@ -1,6 +1,8 @@
 """Pydantic schemas for the admin activity/transaction log."""
 
 from datetime import datetime
+from decimal import Decimal
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -30,3 +32,36 @@ class ActivityPage(BaseModel):
 
     items: list[ActivityItem]
     meta: PaginationMeta
+
+
+DeliveryStatus = Literal["confirmed", "detailing", "en_route", "handover_ready"]
+
+
+class DeliveryItem(BaseModel):
+    """One customer delivery dispatch tracked by the concierge desk."""
+
+    id: UUID
+    created_at: datetime
+    delivery_status: str
+    customer_id: UUID | None
+    customer_name: str | None
+    customer_email: str | None
+    vehicle_id: UUID
+    vehicle_make: str
+    vehicle_model: str
+    vehicle_year: int
+    vehicle_price: Decimal
+    vehicle_image_url: str | None
+
+
+class DeliveryPage(BaseModel):
+    """A paginated list of concierge deliveries."""
+
+    items: list[DeliveryItem]
+    meta: PaginationMeta
+
+
+class UpdateDeliveryStatusRequest(BaseModel):
+    """Administrator update to a delivery's lifecycle state."""
+
+    delivery_status: DeliveryStatus

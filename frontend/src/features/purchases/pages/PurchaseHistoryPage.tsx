@@ -158,6 +158,7 @@ export function PurchaseHistoryPage() {
                   purchaseId={purchase.id}
                   purchasedAt={purchase.purchased_at}
                   vehicleName={`${purchase.vehicle.make} ${purchase.vehicle.model}`}
+                  currentStageId={purchase.delivery_status}
                 />
               </article>
             ))}

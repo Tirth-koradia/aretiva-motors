@@ -5,9 +5,9 @@
 Aretiva Motors is a luxury automotive showroom, transaction engine, and inventory desk built with rigorous **Test-Driven Development (TDD)**. The name combines *aretē* (the Hellenic ideal of excellence and moral virtue) with *iterative engineering* — quality continuously proven through automated tests, pessimistic concurrency safeguards, and domain-driven design.
 
 [![CI](https://github.com/Tirth-koradia/aretiva-motors/actions/workflows/ci.yml/badge.svg)](https://github.com/Tirth-koradia/aretiva-motors/actions/workflows/ci.yml)
-![Backend Tests](https://img.shields.io/badge/Backend%20Tests-20%20passing-emerald?style=flat&logo=pytest)
-![Frontend Tests](https://img.shields.io/badge/Frontend%20Tests-13%20passing-emerald?style=flat&logo=vitest)
-![Coverage](https://img.shields.io/badge/Test%20Suites-100%25%20Passing%20(33%2F33)-blue?style=flat)
+![Backend Tests](https://img.shields.io/badge/Backend%20Tests-23%20passing-emerald?style=flat&logo=pytest)
+![Frontend Tests](https://img.shields.io/badge/Frontend%20Tests-16%20passing-emerald?style=flat&logo=vitest)
+![Coverage](https://img.shields.io/badge/Test%20Suites-100%25%20Passing%20(39%2F39)-blue?style=flat)
 ![Discipline](https://img.shields.io/badge/Discipline-Strict%20TDD%20(Red%E2%86%92Green%E2%86%92Refactor)-purple?style=flat)
 ![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20RBAC%20%2B%20Pessimistic%20Locking-black?style=flat)
 
@@ -93,6 +93,12 @@ To make testing instantaneous without copying and pasting passwords:
    - Click the **Activity & Transaction Ledger** tab next to Fleet Inventory.
    - Inspect the real-time audit trail recording every purchase and restock event with timestamp, vehicle model, quantity delta (`1 ➔ 0`), and collector email.
 
+9. **Admin Concierge Delivery Lifecycle Desk**:
+   - Click the **Concierge Deliveries (Lifecycle)** tab.
+   - Review active client deliveries, collector emails, deterministic tracking codes (`AM-TRK-...`), and dispatch stages.
+   - Select any stage from the dropdown or click **Advance ➔** to progress the white-glove delivery protocol (`Acquisition Confirmed` ➔ `Custom Detailing` ➔ `En Route` ➔ `Handover Ready`).
+   - Use the header role switcher (`Reviewer: Switch to Customer ⇄`) and open **Your considerations** ([`/purchases`](https://aretiva-motors-pzpp6ku74-tirthkoradia4-4121s-projects.vercel.app/purchases)) to see the customer tracker immediately reflect the updated stage in real time!
+
 ---
 
 ## 🏛️ Architectural Highlights
@@ -117,7 +123,7 @@ To make testing instantaneous without copying and pasting passwords:
 ```
 
 - **Pessimistic Concurrency Locking**: Purchases run inside explicit transactional boundaries utilizing `SELECT quantity FROM vehicles WHERE id = :id FOR UPDATE`. This eliminates race conditions and double-spending even under high simultaneous traffic.
-- **Role-Based Access Control (RBAC)**: All administrative endpoints (`POST /api/vehicles`, `PUT`, `DELETE`, `POST /restock`, `GET /admin/activity`) strictly verify the user's `role == 'admin'` server-side from signed JWTs.
+- **Role-Based Access Control (RBAC)**: All administrative endpoints (`POST /api/vehicles`, `PUT`, `DELETE`, `POST /restock`, `GET /admin/activity`, `GET /admin/deliveries`, `PATCH /admin/deliveries/{id}`) strictly verify the user's `role == 'admin'` server-side from signed JWTs.
 - **Verdigris Luxury Aesthetic**: Designed with an editorial, museum-grade visual hierarchy, custom typographic scaling, bespoke pill chips, micro-animations, and full responsive behavior.
 - **Detailed Diagrams**: Full system topology, ERD schemas, and concurrency sequence flows are documented in [`docs/architecture.md`](./docs/architecture.md).
 
@@ -128,10 +134,10 @@ To make testing instantaneous without copying and pasting passwords:
 Development followed a disciplined **Red → Green → Refactor** TDD workflow. Every endpoint and user interaction was validated by an automated test prior to implementation:
 
 ```bash
-# Backend test suite (20 integration & concurrency tests)
+# Backend test suite (23 integration & concurrency tests)
 cd backend && .venv/bin/pytest -q
 
-# Frontend test suite (15 Vitest interaction & component tests)
+# Frontend test suite (16 Vitest interaction & component tests)
 cd frontend && npm test -- --run
 ```
 
@@ -143,10 +149,11 @@ cd frontend && npm test -- --run
 | **Catalog & Tolerant Search** | Pytest / Vitest | Substring `ILIKE` make search, price & year intervals, body styles, active filter chips | **5 / 5 Passed** |
 | **Pessimistic Concurrency** | Pytest | Simultaneous final-unit purchases, `SELECT ... FOR UPDATE` row locks, 409 Conflict handling | **2 / 2 Passed** |
 | **Purchase History & Receipts** | Vitest | Customer ledger projection, Certificate of Acquisition modal & print formatting | **3 / 3 Passed** |
+| **Concierge Delivery Management** | Pytest / Vitest | Lifecycle state machine (`confirmed` ➔ `detailing` ➔ `en_route` ➔ `handover_ready`), admin RBAC enforcement, client sync | **4 / 4 Passed** |
 | **Financing & EMI Estimator** | Vitest | Dynamic amortization, down payment presets (20-50%), loan tenure recalculation | **2 / 2 Passed** |
 | **Admin Operations & Audit** | Pytest / Vitest | Vehicle CRUD, restock events, low-stock alerts, live Activity Ledger UI | **4 / 4 Passed** |
 | **Service Health & Uptime** | Pytest | Health check endpoint returning database readiness & latency | **2 / 2 Passed** |
-| **Total Automated Tests** | | **Backend (20) + Frontend (13)** | **33 / 33 Passed (100%)** |
+| **Total Automated Tests** | | **Backend (23) + Frontend (16)** | **39 / 39 Passed (100%)** |
 
 *Full test execution logs and coverage details are available in [`docs/test-report.md`](./docs/test-report.md).*
 

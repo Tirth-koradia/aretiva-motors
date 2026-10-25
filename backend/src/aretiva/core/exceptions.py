@@ -61,3 +61,11 @@ class VehicleOutOfStockError(AppError):
     status_code = status.HTTP_409_CONFLICT
     code = "VEHICLE_OUT_OF_STOCK"
     message = "This vehicle is no longer available for purchase."
+
+
+class DeliveryNotFoundError(AppError):
+    """Raised when a delivery transaction cannot be found."""
+
+    status_code = status.HTTP_404_NOT_FOUND
+    code = "DELIVERY_NOT_FOUND"
+    message = "The requested delivery order could not be found."

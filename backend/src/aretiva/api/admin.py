@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aretiva.api.deps import require_role
+from aretiva.core.exceptions import DeliveryNotFoundError
 from aretiva.db.models.inventory_transaction import (
     InventoryTransaction,
     InventoryTransactionType,
@@ -15,7 +16,13 @@ from aretiva.db.models.inventory_transaction import (
 from aretiva.db.models.user import User, UserRole
 from aretiva.db.models.vehicle import Vehicle
 from aretiva.db.session import get_session
-from aretiva.schemas.activity import ActivityItem, ActivityPage
+from aretiva.schemas.activity import (
+    ActivityItem,
+    ActivityPage,
+    DeliveryItem,
+    DeliveryPage,
+    UpdateDeliveryStatusRequest,
+)
 from aretiva.schemas.vehicle import PaginationMeta
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -76,4 +83,100 @@ async def list_activity(
             total=total,
             total_pages=(total + page_size - 1) // page_size,
         ),
+    )
+
+
+@router.get("/deliveries", response_model=DeliveryPage)
+async def list_deliveries(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    _: Annotated[User, Depends(require_role(UserRole.ADMIN))],
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+) -> DeliveryPage:
+    """Return paginated customer purchase deliveries for the concierge desk; admin only."""
+    count_q = (
+        select(func.count())
+        .select_from(InventoryTransaction)
+        .where(InventoryTransaction.transaction_type == InventoryTransactionType.PURCHASE)
+    )
+    total = (await session.execute(count_q)).scalar_one()
+
+    rows_q = (
+        select(InventoryTransaction, Vehicle, User)
+        .join(Vehicle, Vehicle.id == InventoryTransaction.vehicle_id)
+        .outerjoin(User, User.id == InventoryTransaction.user_id)
+        .where(InventoryTransaction.transaction_type == InventoryTransactionType.PURCHASE)
+        .order_by(InventoryTransaction.created_at.desc(), InventoryTransaction.id.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    )
+    rows = (await session.execute(rows_q)).all()
+
+    return DeliveryPage(
+        items=[
+            DeliveryItem(
+                id=tx.id,
+                created_at=tx.created_at,
+                delivery_status=tx.delivery_status,
+                customer_id=tx.user_id,
+                customer_name=user.full_name if user else None,
+                customer_email=user.email if user else None,
+                vehicle_id=vehicle.id,
+                vehicle_make=vehicle.make,
+                vehicle_model=vehicle.model,
+                vehicle_year=vehicle.year,
+                vehicle_price=vehicle.price,
+                vehicle_image_url=vehicle.image_url,
+            )
+            for tx, vehicle, user in rows
+        ],
+        meta=PaginationMeta(
+            page=page,
+            page_size=page_size,
+            total=total,
+            total_pages=(total + page_size - 1) // page_size,
+        ),
+    )
+
+
+@router.patch("/deliveries/{transaction_id}", response_model=DeliveryItem)
+async def update_delivery_status(
+    transaction_id: UUID,
+    payload: UpdateDeliveryStatusRequest,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    _: Annotated[User, Depends(require_role(UserRole.ADMIN))],
+) -> DeliveryItem:
+    """Update the concierge delivery lifecycle stage for an acquired vehicle; admin only."""
+    row = (
+        await session.execute(
+            select(InventoryTransaction, Vehicle, User)
+            .join(Vehicle, Vehicle.id == InventoryTransaction.vehicle_id)
+            .outerjoin(User, User.id == InventoryTransaction.user_id)
+            .where(
+                InventoryTransaction.id == transaction_id,
+                InventoryTransaction.transaction_type == InventoryTransactionType.PURCHASE,
+            )
+        )
+    ).first()
+    if row is None:
+        raise DeliveryNotFoundError
+
+    tx, vehicle, user = row
+    tx.delivery_status = payload.delivery_status
+    await session.commit()
+    await session.refresh(tx)
+
+    return DeliveryItem(
+        id=tx.id,
+        created_at=tx.created_at,
+        delivery_status=tx.delivery_status,
+        customer_id=tx.user_id,
+        customer_name=user.full_name if user else None,
+        customer_email=user.email if user else None,
+        vehicle_id=vehicle.id,
+        vehicle_make=vehicle.make,
+        vehicle_model=vehicle.model,
+        vehicle_year=vehicle.year,
+        vehicle_price=vehicle.price,
+        vehicle_image_url=vehicle.image_url,
     )

@@ -22,9 +22,9 @@ This report records all automated quality checks for Aretiva Motors.
 
 | Check | Result | Detail |
 | --- | --- | --- |
-| Backend integration suite | ✅ Pass | 20 passed, 0 failed — isolated `aretiva_test` PostgreSQL, including real-Postgres concurrency test |
+| Backend integration suite | ✅ Pass | 23 passed, 0 failed — isolated `aretiva_test` PostgreSQL, including real-Postgres concurrency test and admin delivery lifecycle management |
 | Backend static checks | ✅ Pass | `ruff check` and `ruff format --check` — 0 errors |
-| Frontend interaction suite | ✅ Pass | 15 passed, 0 failed across 7 suites — Vitest + Testing Library |
+| Frontend interaction suite | ✅ Pass | 16 passed, 0 failed across 7 suites — Vitest + Testing Library |
 | Frontend static checks | ✅ Pass | TypeScript `noEmit` and ESLint — 0 errors |
 | Frontend production build | ✅ Pass | Vite production bundle builds cleanly |
 | CI pipeline | ✅ Pass | GitHub Actions runs both suites on every push to `main` |
@@ -38,6 +38,7 @@ This report records all automated quality checks for Aretiva Motors.
 | `tests/test_vehicles.py` | Vehicle CRUD, search, pagination | 7 |
 | `tests/test_purchases.py` | Purchase, restock, purchase history | 5 |
 | `tests/test_concurrency.py` | Concurrent final-unit purchase | 2 |
+| `tests/integration/test_delivery_management.py` | Admin delivery lifecycle management & RBAC | 3 |
 
 ## Frontend test breakdown
 
@@ -49,8 +50,8 @@ This report records all automated quality checks for Aretiva Motors.
 | `ShowroomPage.test.tsx` | Authenticated vehicle catalogue, sign out, filter chips & side-by-side comparison | 4 |
 | `VehicleDetailPage.test.tsx` | Detail page, purchase flow, financing & EMI estimator | 2 |
 | `PurchaseHistoryPage.test.tsx` | Customer purchase history, printable receipt & concierge delivery tracker | 3 |
-| `AdminInventoryPage.test.tsx` | Admin restock, inventory list, activity & transaction ledger audit log | 2 |
-| **Total Automated Tests** | **Backend (20) + Frontend (15)** | **35 / 35 Passing (100%)** |
+| `AdminInventoryPage.test.tsx` | Admin restock, inventory list, activity & transaction ledger audit log, concierge delivery lifecycle | 3 |
+| **Total Automated Tests** | **Backend (23) + Frontend (16)** | **39 / 39 Passing (100%)** |
 
 ## Known notes
 
