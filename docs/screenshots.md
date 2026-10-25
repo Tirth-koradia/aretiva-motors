@@ -67,7 +67,36 @@ This gallery showcases the primary customer acquisition workflows, administrator
 
 ---
 
-## 10. Responsive Mobile Showroom UX
-> *Adaptive mobile layout with touch drawer navigation, condensed vehicle cards, and responsive filter interactions.*
+## 10. Commission New Vehicle (Admin Inventory Modal)
+> *Administrative modal for commissioning new luxury inventory with form validation, category selection, and 1-click automatic 17-character VIN generation (`generate unique vin ↺`).*
 
-![Mobile Showroom](./screenshots/10-mobile-showroom.png)
+![Commission New Vehicle Modal](./screenshots/adding_new_vehicle.png)
+
+---
+
+## 11. High-Resolution Vehicle Dossier & Acquisition
+> *Immersive vehicle presentation with verified provenance, high-resolution visual hero, mechanical badges, and direct acquisition CTA.*
+
+![Vehicle Dossier & Acquisition](./screenshots/car_detail.png)
+
+---
+
+## 12. Mechanical Specifications & Financial Amortization Estimator
+> *Full technical specification dossier accompanied by the interactive bespoke EMI financing calculator and tenure options.*
+
+![Vehicle Specifications & Financing](./screenshots/car_detail_2.png)
+
+---
+
+## 13. Private Collector Authentication & Reviewer Quick Access
+> *Editorial authentication portal featuring instant 1-click demo credential shortcuts (`Customer Demo` and `Admin Demo`) for immediate reviewer access.*
+
+![Login & Reviewer Quick Access](./screenshots/Login_page.png)
+
+---
+
+## 14. VIP Collector Registration & Onboarding
+> *Seamless private account creation workflow with real-time field validation and security standards.*
+
+![Collector Registration](./screenshots/registration_page.png)
+

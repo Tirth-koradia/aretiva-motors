@@ -50,8 +50,11 @@ To keep this README fast and uncluttered, all high-resolution captures are curat
 | [**06 — Certificate of Acquisition**](./docs/screenshots/06-certificate-of-acquisition.png) | Documentation | Bespoke printable acquisition receipt, VIN verification, asset ledger |
 | [**07 — Fleet Inventory Desk**](./docs/screenshots/07-admin-inventory-desk.png) | Admin Operations | Low-stock badges ("Only 1 left!"), instant restock, new acquisitions |
 | [**08 — Live Activity Ledger**](./docs/screenshots/08-admin-activity-ledger.png) | Audit Trail | Real-time immutable audit log of inventory mutations & collector transactions |
-| [**09 — Concierge Delivery Desk**](./docs/screenshots/09-admin-delivery-management.png) | Admin Operations | 1-click stage advancement, dispatch tracker sync with customer orders |
-| [**10 — Mobile Showroom**](./docs/screenshots/10-mobile-showroom.png) | Responsive UX | Native mobile layout, touch filter drawer, responsive typography |
+| [**10 — Commission Vehicle Modal**](./docs/screenshots/adding_new_vehicle.png) | Admin Operations | Administrative acquisition modal, form validation, 1-click VIN generator |
+| [**11 — Vehicle Dossier & Acquisition**](./docs/screenshots/car_detail.png) | Vehicle Detail | Full luxury vehicle dossier, provenance, mechanical attributes, acquire CTA |
+| [**12 — Specifications & Financing**](./docs/screenshots/car_detail_2.png) | Financing | Detailed specifications matrix and interactive bespoke EMI loan calculator |
+| [**13 — Authentication & Reviewer Shortcuts**](./docs/screenshots/Login_page.png) | Security & Access | Editorial sign-in with 1-click verified Customer/Admin access shortcuts |
+| [**14 — VIP Collector Registration**](./docs/screenshots/registration_page.png) | Onboarding | Secure collector registration flow with real-time field validation |
 
 *(Reviewers can inspect the complete annotated gallery with full-resolution images directly in [**`docs/screenshots.md`**](./docs/screenshots.md)).*
 
