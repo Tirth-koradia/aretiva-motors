@@ -35,6 +35,27 @@ Welcome to the Aretiva Motors assessment review! This project was engineered spe
 
 ---
 
+### 📸 Visual Walkthrough & Screenshots Gallery
+
+To keep this README fast and uncluttered, all high-resolution captures are curated in **[`docs/screenshots.md`](./docs/screenshots.md)**:
+
+| Screenshot | Category | Key Luxury & Architectural Capabilities Highlighted |
+|---|---|---|
+| [**01 — Editorial Hero**](./docs/screenshots/01-landing-hero.png) | Landing | Museum-grade Verdigris typography, brand identity, quick reviewer CTAs |
+| [**02 — Curated Showroom**](./docs/screenshots/02-showroom-catalog.png) | Discovery | Multi-parameter search, body category filters, active dismissal chips |
+| [**03 — Side-by-Side Comparison**](./docs/screenshots/03-vehicle-comparison-modal.png) | Specification | Multi-vehicle comparison matrix, silhouettes, powertrains, EMI values |
+| [**04 — Bespoke EMI Estimator**](./docs/screenshots/04-vehicle-detail-financing.png) | Financing | 20-50% down payment presets, 36-60 mos tenure, live amortization |
+| [**05 — Concierge Delivery Tracker**](./docs/screenshots/05-concierge-delivery-tracker.png) | Customer Experience | 4-stage white-glove protocol stepper, tracking ID, liaison desk |
+| [**06 — Certificate of Acquisition**](./docs/screenshots/06-certificate-of-acquisition.png) | Documentation | Bespoke printable acquisition receipt, VIN verification, asset ledger |
+| [**07 — Fleet Inventory Desk**](./docs/screenshots/07-admin-inventory-desk.png) | Admin Operations | Low-stock badges ("Only 1 left!"), instant restock, new acquisitions |
+| [**08 — Live Activity Ledger**](./docs/screenshots/08-admin-activity-ledger.png) | Audit Trail | Real-time immutable audit log of inventory mutations & collector transactions |
+| [**09 — Concierge Delivery Desk**](./docs/screenshots/09-admin-delivery-management.png) | Admin Operations | 1-click stage advancement, dispatch tracker sync with customer orders |
+| [**10 — Mobile Showroom**](./docs/screenshots/10-mobile-showroom.png) | Responsive UX | Native mobile layout, touch filter drawer, responsive typography |
+
+*(Reviewers can inspect the complete annotated gallery with full-resolution images directly in [**`docs/screenshots.md`**](./docs/screenshots.md)).*
+
+---
+
 ### ⚡ 1-Click Reviewer Access & Demo Credentials
 
 To make testing instantaneous without copying and pasting passwords:

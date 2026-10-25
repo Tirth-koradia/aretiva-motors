@@ -16,7 +16,8 @@ This document serves as the chronological, unedited record of AI collaboration d
 7. [Session 7 — Documentation Polish, Video Demo Slot & Assessment Readiness](#session-7--documentation-polish-video-demo-slot--assessment-readiness)
 8. [Session 8 — Luxury Vehicle Comparison Drawer & Concierge Delivery Lifecycle Tracker](#session-8--luxury-vehicle-comparison-drawer--concierge-delivery-lifecycle-tracker)
 9. [Session 9 — Administrator Concierge Delivery Lifecycle Management & Stage Sync](#session-9--administrator-concierge-delivery-lifecycle-management--stage-sync)
-10. [Original AI Conversation & Recovered Codex Transcript](#original-ai-conversation--recovered-codex-transcript)
+10. [Session 10 — Duplicate VIN Safeguards, 1-Click VIN Generator & High-Res Screenshots Gallery](#session-10--duplicate-vin-safeguards-1-click-vin-generator--high-res-screenshots-gallery)
+11. [Original AI Conversation & Recovered Codex Transcript](#original-ai-conversation--recovered-codex-transcript)
 
 ---
 
@@ -183,6 +184,31 @@ This document serves as the chronological, unedited record of AI collaboration d
   - Added frontend test in `AdminInventoryPage.test.tsx` verifying tab switching and stage advancement.
   - Test suites expanded to **23 backend + 16 frontend = 39 passing tests (100% pass rate)**.
   - Strict TypeScript compilation (`tsc -b`) and ESLint completed with 0 errors.
+
+---
+
+## Session 10 — Duplicate VIN Safeguards, 1-Click VIN Generator & High-Res Screenshots Gallery
+
+- **Date:** 25 October 2026
+- **Tool:** Antigravity
+- **Prompts & User Intent:**
+  - *"this is the error that is coming when i am trying to add a vehicle"* (image attached showing network connection error on duplicate VIN `JTHHZ5EC2P5019284`)
+  - *"can you make sure to add the screenshots as they are mentioned necessary ... would it be a good idea to post the link of all the scrrenshots in the readme as one , so that the reviewer can view the screenshots while clicking on the link and not make readme file unneccasary lengthy"*
+- **Engineering Actions:**
+  - **Duplicate VIN Safeguards & 409 Conflict (`exceptions.py`, `services/vehicles.py`, `test_vehicle_creation.py`)**:
+    - Identified that submitting an existing VIN triggered an uncaught PostgreSQL `UniqueViolation` resulting in a 500 error lacking CORS headers, manifesting as a browser "Failed to fetch" network error.
+    - Added `VehicleVinAlreadyExistsError` (HTTP 409 Conflict) and caught database `IntegrityError` in `create_vehicle` and `update_vehicle` with session rollback.
+    - Added backend integration test `test_administrator_duplicate_vin_returns_409_conflict`.
+  - **1-Click Unique VIN Generator (`AdminVehicleFormModal.tsx`)**:
+    - Auto-prepopulated new acquisition modal with a unique 17-character VIN (`AM...`).
+    - Added a `generate unique vin ↺` action button above the VIN field for instant 1-click generation.
+  - **High-Resolution Visual Screenshots Gallery (`scripts/capture_screenshots.mjs`, `docs/screenshots.md`)**:
+    - Built and executed an automated headless browser capture script using local authentication session tokens.
+    - Captured 10 high-resolution desktop and mobile screenshots covering every luxury workflow, comparison modal, EMI estimator, concierge delivery tracker, and admin audit ledger.
+    - Created a clean visual tour index in `docs/screenshots.md` and integrated a summary table in `README.md`.
+- **TDD Verification:**
+  - 40 / 40 automated tests passed (24 backend + 16 frontend, 100% pass rate).
+  - Ruff formatting, ESLint, and strict TypeScript checks passed with 0 errors.
 
 ---
 
