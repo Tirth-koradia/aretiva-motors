@@ -229,3 +229,6 @@ Every commit follows strict pair-programming accountability:
   ```text
   Co-authored-by: OpenAI Codex <AI@users.noreply.github.com>
   ```
+
+- **Recovered Codex Raw Transcript:** [https://yeet.md/s/tU0LQAaz](https://yeet.md/s/tU0LQAaz) *(recovered from local backup `docs/prompts/assignment-session-backup.jsonl`, completely unedited and raw)*
+

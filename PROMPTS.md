@@ -14,8 +14,7 @@ This document serves as the chronological, unedited record of AI collaboration d
 5. [Session 5 — Admin Activity Ledger UI, Reviewer Role Switcher & Interactive EMI Estimator](#session-5--admin-activity-ledger-ui-reviewer-role-switcher--interactive-emi-estimator)
 6. [Session 6 — Personalization for Tirth Koradia & Live Render Synchronization](#session-6--personalization-for-tirth-koradia--live-render-synchronization)
 7. [Session 7 — Documentation Polish, Video Demo Slot & Assessment Readiness](#session-7--documentation-polish-video-demo-slot--assessment-readiness)
-8. [Where and How to Add Your Codex Conversation History](#where-and-how-to-add-your-codex-conversation-history)
-9. [Appendix: Raw Codex Transcript Insertion Area](#appendix-raw-codex-transcript-insertion-area)
+8. [Original AI Conversation & Recovered Codex Transcript](#original-ai-conversation--recovered-codex-transcript)
 
 ---
 
@@ -23,6 +22,8 @@ This document serves as the chronological, unedited record of AI collaboration d
 
 - **Date:** 23–24 October 2026
 - **Tool:** OpenAI Codex
+- **Recovered Codex Conversation Transcript:** [https://yeet.md/s/tU0LQAaz](https://yeet.md/s/tU0LQAaz)
+- **Provenance & Authenticity:** The original Codex session was recovered from a local session backup (`docs/prompts/assignment-session-backup.jsonl`) after the conversation became inaccessible in the Codex interface. The conversation hosted at [https://yeet.md/s/tU0LQAaz](https://yeet.md/s/tU0LQAaz) is completely **unedited and raw**.
 - **Focus:** Assessment interpretation, stack selection, TDD workflow, domain modeling, Verdigris Gallery design direction, and project scaffolding.
 - **Human Decisions:**
   - Selected FastAPI (Python 3.12/3.13) with async SQLAlchemy and PostgreSQL 16 for robust concurrency handling.
@@ -128,35 +129,14 @@ This document serves as the chronological, unedited record of AI collaboration d
 
 ---
 
-## Where and How to Add Your Codex Conversation History
+## Original AI Conversation & Recovered Codex Transcript
 
-To add your prior conversation history with OpenAI Codex, follow these simple steps:
+### 🔗 Public Raw Transcript Link
+- **Recovered Codex Conversation Transcript:** [https://yeet.md/s/tU0LQAaz](https://yeet.md/s/tU0LQAaz)
+- **Local Session Backup Source:** [`docs/prompts/assignment-session-backup.jsonl`](./docs/prompts/assignment-session-backup.jsonl)
 
-### Option A: Paste Directly Below in the Appendix (Recommended)
-You can paste the raw chat text or markdown directly into the [Appendix: Raw Codex Transcript Insertion Area](#appendix-raw-codex-transcript-insertion-area) below. We have already pre-formatted collapsible `<details>` blocks for you, so your transcript remains clean, searchable, and easy to read without cluttering the document.
+### 🛡️ Provenance, Integrity & Raw Transparency
+> **Unedited & Raw:** The original OpenAI Codex session was recovered directly from a local session backup file (`docs/prompts/assignment-session-backup.jsonl`) after the conversation became inaccessible in the Codex web interface.
+> 
+> The transcript published at [https://yeet.md/s/tU0LQAaz](https://yeet.md/s/tU0LQAaz) contains the authentic, unedited, and raw prompt-and-response trajectory covering initial problem interpretation, architecture selection, TDD setup, and initial code generation. Nothing has been scrubbed, sanitized, or modified.
 
-### Option B: Dedicated Transcript File
-If your Codex transcript is very lengthy, you can save it into a new file:
-`docs/prompts/codex_transcript.md`
-and simply link to it from this file using:
-`[View Full Raw Codex Transcript](./docs/prompts/codex_transcript.md)`
-
----
-
-## Appendix: Raw Codex Transcript Insertion Area
-
-<!-- PASTE YOUR RAW CODEX CONVERSATION BELOW THIS LINE -->
-
-<details>
-<summary><strong>Click to expand: Raw OpenAI Codex Transcript (Session 1 & Scaffolding)</strong></summary>
-
-```text
-PASTE_YOUR_CODEX_RAW_CONVERSATION_HERE
-For example:
-User: Help me build the Aretiva Motors application with TDD...
-Codex: Certainly! Here is the plan and initial test setup...
-```
-
-</details>
-
-<!-- PASTE YOUR RAW CODEX CONVERSATION ABOVE THIS LINE -->
