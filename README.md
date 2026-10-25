@@ -22,6 +22,7 @@ Welcome to the Aretiva Motors assessment review! This project was engineered spe
 | Service | Link | Description |
 |---|---|---|
 | **Live Web Application** | [Aretiva Motors Production](https://aretiva-motors.vercel.app/) | Deployed on Vercel with edge caching & client SPA rewrites |
+| **Video Demo Walkthrough** | [YouTube Video Walkthrough](https://youtu.be/_0vMfqBgcyE) | 3-minute guided walkthrough of customer & admin workflows |
 | **Interactive API Docs** | [FastAPI Swagger UI](https://aretiva-backend.onrender.com/docs) | Live OpenAPI 3.1 documentation & interactive execution sandbox on Render |
 | **Production Health Probe** | [`GET /health`](https://aretiva-backend.onrender.com/health) | Uptime check returning database latency & system readiness |
 
@@ -29,9 +30,9 @@ Welcome to the Aretiva Motors assessment review! This project was engineered spe
 
 ### 🎬 Live Demo & Video Walkthrough
 
-> 📹 **Video Demo Link:** *(Paste your live walkthrough demo link here)*
+> 📹 **Video Demo Link:** [**Watch Live Walkthrough on YouTube (3 mins)**](https://youtu.be/_0vMfqBgcyE)
 > 
-> *A concise 3-minute video walkthrough showcasing customer acquisition flows, race-condition concurrency tests, the live admin activity ledger, and bespoke financing calculations.*
+> *A concise 3-minute video walkthrough showcasing customer acquisition flows, race-condition concurrency tests, the live admin activity ledger, concierge delivery tracking, and bespoke financing calculations.*
 
 ---
 
