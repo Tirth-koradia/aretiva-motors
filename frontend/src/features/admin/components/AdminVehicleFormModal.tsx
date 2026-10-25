@@ -99,10 +99,13 @@ export default function AdminVehicleFormModal({
     setLoading(true)
     setErrorMessage(null)
 
+    const rawPrice = String(formData.price || '').replace(/,/g, '').trim()
+    const sanitizedImageUrl = formData.image_url?.trim() ? formData.image_url.trim() : null
+
     const payload = {
       ...formData,
-      image_url: formData.image_url.trim() ? formData.image_url.trim() : null,
-      price: String(formData.price),
+      image_url: sanitizedImageUrl,
+      price: rawPrice,
     }
 
     try {
@@ -115,9 +118,13 @@ export default function AdminVehicleFormModal({
       onClose()
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setErrorMessage(err.message)
+        if (err.message.toLowerCase().includes('failed to fetch')) {
+          setErrorMessage('Network connection error: The backend service may be spinning up or temporarily unreachable. Please retry in a few seconds.')
+        } else {
+          setErrorMessage(err.message)
+        }
       } else {
-        setErrorMessage('Operation failed. Please check inputs.')
+        setErrorMessage('Operation failed. Please verify your inputs and try again.')
       }
     } finally {
       setLoading(false)

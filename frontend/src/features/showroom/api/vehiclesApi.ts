@@ -192,8 +192,18 @@ export async function createVehicle(session: LoginResult, payload: Omit<Vehicle,
   })
 
   if (!response.ok) {
-    const payloadErr = await response.json().catch(() => null) as { error?: { message?: string } } | null
-    throw new Error(payloadErr?.error?.message ?? 'Could not create vehicle.')
+    const payloadErr = (await response.json().catch(() => null)) as {
+      error?: { message?: string }
+      detail?: Array<{ loc?: string[]; msg?: string }> | string
+    } | null
+    const detailMsg = Array.isArray(payloadErr?.detail)
+      ? payloadErr.detail
+          .map((d) => (d.loc && d.loc.length > 1 ? `${d.loc[d.loc.length - 1]}: ${d.msg}` : d.msg))
+          .join('; ')
+      : typeof payloadErr?.detail === 'string'
+        ? payloadErr.detail
+        : null
+    throw new Error(payloadErr?.error?.message ?? detailMsg ?? 'Could not create vehicle.')
   }
 
   return (await response.json()) as Vehicle
@@ -210,8 +220,18 @@ export async function updateVehicle(session: LoginResult, vehicleId: string, pay
   })
 
   if (!response.ok) {
-    const payloadErr = await response.json().catch(() => null) as { error?: { message?: string } } | null
-    throw new Error(payloadErr?.error?.message ?? 'Could not update vehicle.')
+    const payloadErr = (await response.json().catch(() => null)) as {
+      error?: { message?: string }
+      detail?: Array<{ loc?: string[]; msg?: string }> | string
+    } | null
+    const detailMsg = Array.isArray(payloadErr?.detail)
+      ? payloadErr.detail
+          .map((d) => (d.loc && d.loc.length > 1 ? `${d.loc[d.loc.length - 1]}: ${d.msg}` : d.msg))
+          .join('; ')
+      : typeof payloadErr?.detail === 'string'
+        ? payloadErr.detail
+        : null
+    throw new Error(payloadErr?.error?.message ?? detailMsg ?? 'Could not update vehicle.')
   }
 
   return (await response.json()) as Vehicle
