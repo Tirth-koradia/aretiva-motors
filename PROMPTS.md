@@ -131,12 +131,13 @@ This document serves as the chronological, unedited record of AI collaboration d
 
 ## Original AI Conversation & Recovered Codex Transcript
 
-### 🔗 Public Raw Transcript Link
+### 🔗 Public Raw Transcript Link & Local Sources
 - **Recovered Codex Conversation Transcript:** [https://yeet.md/s/tU0LQAaz](https://yeet.md/s/tU0LQAaz)
-- **Local Session Backup Source:** [`docs/prompts/assignment-session-backup.jsonl`](./docs/prompts/assignment-session-backup.jsonl)
+- **Local Plain-Text Transcript:** [`docs/prompts/assignment-conversation.txt`](./docs/prompts/assignment-conversation.txt)
+- **Local JSONL Session Backup:** [`docs/prompts/assignment-session-backup.jsonl`](./docs/prompts/assignment-session-backup.jsonl)
 
 ### 🛡️ Provenance, Integrity & Raw Transparency
-> **Unedited & Raw:** The original OpenAI Codex session was recovered directly from a local session backup file (`docs/prompts/assignment-session-backup.jsonl`) after the conversation became inaccessible in the Codex web interface.
+> **Unedited & Raw:** The original OpenAI Codex session was recovered directly from local session backup files ([`assignment-conversation.txt`](./docs/prompts/assignment-conversation.txt) and [`assignment-session-backup.jsonl`](./docs/prompts/assignment-session-backup.jsonl)) after the conversation became inaccessible in the Codex web interface.
 > 
 > The transcript published at [https://yeet.md/s/tU0LQAaz](https://yeet.md/s/tU0LQAaz) contains the authentic, unedited, and raw prompt-and-response trajectory covering initial problem interpretation, architecture selection, TDD setup, and initial code generation. Nothing has been scrubbed, sanitized, or modified.
 

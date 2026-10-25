@@ -34,6 +34,36 @@ Object.defineProperty(window, 'localStorage', {
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
 
+// Suppress unhandled AbortSignal/AbortError rejections during test unmount/teardown
+const isAbortError = (reason: unknown): boolean => {
+  if (!reason) return false
+  if (reason instanceof Error) {
+    return (
+      reason.name === 'AbortError' ||
+      reason.message.includes('aborted') ||
+      reason.message.includes('AbortSignal')
+    )
+  }
+  const str = String(reason)
+  return str.includes('AbortError') || str.includes('aborted') || str.includes('AbortSignal')
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('unhandledrejection', (event) => {
+    if (isAbortError(event.reason)) {
+      event.preventDefault()
+    }
+  })
+}
+
+if (typeof process !== 'undefined' && typeof process.on === 'function') {
+  process.on('unhandledRejection', (reason) => {
+    if (isAbortError(reason)) {
+      return
+    }
+  })
+}
+
 afterEach(() => {
   cleanup()
   server.resetHandlers()
@@ -41,3 +71,4 @@ afterEach(() => {
 })
 
 afterAll(() => server.close())
+

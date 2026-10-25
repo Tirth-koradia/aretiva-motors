@@ -219,7 +219,7 @@ npm run dev
 
 ---
 
-## 🤖 AI Collaboration Record
+## My AI Usage
 
 A complete, unedited record of all AI prompts, engineering decisions, and TDD iterations is maintained in [`PROMPTS.md`](./PROMPTS.md).
 
