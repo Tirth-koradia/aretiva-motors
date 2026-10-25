@@ -5,9 +5,9 @@
 Aretiva Motors is a luxury automotive showroom, transaction engine, and inventory desk built with rigorous **Test-Driven Development (TDD)**. The name combines *aretē* (the Hellenic ideal of excellence and moral virtue) with *iterative engineering* — quality continuously proven through automated tests, pessimistic concurrency safeguards, and domain-driven design.
 
 [![CI](https://github.com/Tirth-koradia/aretiva-motors/actions/workflows/ci.yml/badge.svg)](https://github.com/Tirth-koradia/aretiva-motors/actions/workflows/ci.yml)
-![Backend Tests](https://img.shields.io/badge/Backend%20Tests-23%20passing-emerald?style=flat&logo=pytest)
+![Backend Tests](https://img.shields.io/badge/Backend%20Tests-24%20passing-emerald?style=flat&logo=pytest)
 ![Frontend Tests](https://img.shields.io/badge/Frontend%20Tests-16%20passing-emerald?style=flat&logo=vitest)
-![Coverage](https://img.shields.io/badge/Test%20Suites-100%25%20Passing%20(39%2F39)-blue?style=flat)
+![Coverage](https://img.shields.io/badge/Test%20Suites-100%25%20Passing%20(40%2F40)-blue?style=flat)
 ![Discipline](https://img.shields.io/badge/Discipline-Strict%20TDD%20(Red%E2%86%92Green%E2%86%92Refactor)-purple?style=flat)
 ![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20RBAC%20%2B%20Pessimistic%20Locking-black?style=flat)
 
@@ -134,7 +134,7 @@ To make testing instantaneous without copying and pasting passwords:
 Development followed a disciplined **Red → Green → Refactor** TDD workflow. Every endpoint and user interaction was validated by an automated test prior to implementation:
 
 ```bash
-# Backend test suite (23 integration & concurrency tests)
+# Backend test suite (24 integration & concurrency tests)
 cd backend && .venv/bin/pytest -q
 
 # Frontend test suite (16 Vitest interaction & component tests)
@@ -151,9 +151,9 @@ cd frontend && npm test -- --run
 | **Purchase History & Receipts** | Vitest | Customer ledger projection, Certificate of Acquisition modal & print formatting | **3 / 3 Passed** |
 | **Concierge Delivery Management** | Pytest / Vitest | Lifecycle state machine (`confirmed` ➔ `detailing` ➔ `en_route` ➔ `handover_ready`), admin RBAC enforcement, client sync | **4 / 4 Passed** |
 | **Financing & EMI Estimator** | Vitest | Dynamic amortization, down payment presets (20-50%), loan tenure recalculation | **2 / 2 Passed** |
-| **Admin Operations & Audit** | Pytest / Vitest | Vehicle CRUD, restock events, low-stock alerts, live Activity Ledger UI | **4 / 4 Passed** |
+| **Admin Operations & Audit** | Pytest / Vitest | Vehicle CRUD, restock events, duplicate VIN prevention, low-stock alerts, live Activity Ledger UI | **5 / 5 Passed** |
 | **Service Health & Uptime** | Pytest | Health check endpoint returning database readiness & latency | **2 / 2 Passed** |
-| **Total Automated Tests** | | **Backend (23) + Frontend (16)** | **39 / 39 Passed (100%)** |
+| **Total Automated Tests** | | **Backend (24) + Frontend (16)** | **40 / 40 Passed (100%)** |
 
 *Full test execution logs and coverage details are available in [`docs/test-report.md`](./docs/test-report.md).*
 

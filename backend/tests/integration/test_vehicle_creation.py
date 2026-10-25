@@ -80,3 +80,25 @@ def test_customer_cannot_create_a_vehicle(
             "message": "You do not have permission to perform this action.",
         }
     }
+
+
+def test_administrator_duplicate_vin_returns_409_conflict(
+    client: TestClient,
+    clean_database: None,
+    admin_headers: dict[str, str],
+) -> None:
+    del clean_database
+    first_res = client.post("/api/vehicles", headers=admin_headers, json=vehicle_payload())
+    assert first_res.status_code == 201
+
+    second_res = client.post("/api/vehicles", headers=admin_headers, json=vehicle_payload())
+    assert second_res.status_code == 409
+    assert second_res.json() == {
+        "error": {
+            "code": "VEHICLE_VIN_ALREADY_EXISTS",
+            "message": (
+                "A vehicle with this VIN already exists in the catalogue. "
+                "Please use a unique 17-character VIN."
+            ),
+        }
+    }

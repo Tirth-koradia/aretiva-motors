@@ -25,6 +25,15 @@ type VehicleFormData = {
   image_url: string
 }
 
+function generateUniqueVin(): string {
+  const chars = 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789'
+  let result = 'AM'
+  for (let i = 0; i < 15; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
+}
+
 const initialFormData: VehicleFormData = {
   vin: '',
   make: '',
@@ -72,10 +81,21 @@ export default function AdminVehicleFormModal({
         image_url: vehicle.image_url ?? '',
       })
     } else {
-      setFormData(initialFormData)
+      setFormData({
+        ...initialFormData,
+        vin: generateUniqueVin(),
+      })
     }
     setErrorMessage(null)
   }, [vehicle, isOpen])
+
+  const handleGenerateVin = () => {
+    setFormData((prev) => ({
+      ...prev,
+      vin: generateUniqueVin(),
+    }))
+    setErrorMessage(null)
+  }
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -169,9 +189,21 @@ export default function AdminVehicleFormModal({
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label className="grid gap-1.5 text-xs font-semibold tracking-wide uppercase">
-              VIN (17 characters)
+            <div className="grid gap-1.5 text-xs font-semibold tracking-wide uppercase">
+              <div className="flex items-center justify-between">
+                <label htmlFor="vin">VIN (17 characters)</label>
+                {!isEdit && (
+                  <button
+                    className="text-brand hover:underline font-mono text-[11px] font-medium tracking-normal lowercase"
+                    onClick={handleGenerateVin}
+                    type="button"
+                  >
+                    generate unique vin ↺
+                  </button>
+                )}
+              </div>
               <input
+                id="vin"
                 className="border-ink/20 focus:border-brand focus:ring-brand/20 bg-white px-3 py-2 font-mono text-sm uppercase outline-none focus:ring-2"
                 maxLength={17}
                 minLength={17}
@@ -182,7 +214,7 @@ export default function AdminVehicleFormModal({
                 type="text"
                 value={formData.vin}
               />
-            </label>
+            </div>
 
             <label className="grid gap-1.5 text-xs font-semibold tracking-wide uppercase">
               Make

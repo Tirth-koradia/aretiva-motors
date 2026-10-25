@@ -69,3 +69,14 @@ class DeliveryNotFoundError(AppError):
     status_code = status.HTTP_404_NOT_FOUND
     code = "DELIVERY_NOT_FOUND"
     message = "The requested delivery order could not be found."
+
+
+class VehicleVinAlreadyExistsError(AppError):
+    """Raised when a VIN is already assigned to an existing vehicle."""
+
+    status_code = status.HTTP_409_CONFLICT
+    code = "VEHICLE_VIN_ALREADY_EXISTS"
+    message = (
+        "A vehicle with this VIN already exists in the catalogue. "
+        "Please use a unique 17-character VIN."
+    )

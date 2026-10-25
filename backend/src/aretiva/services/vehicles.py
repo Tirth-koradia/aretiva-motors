@@ -5,9 +5,14 @@ from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import func, or_, select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aretiva.core.exceptions import VehicleNotFoundError, VehicleOutOfStockError
+from aretiva.core.exceptions import (
+    VehicleNotFoundError,
+    VehicleOutOfStockError,
+    VehicleVinAlreadyExistsError,
+)
 from aretiva.db.models.inventory_transaction import (
     InventoryTransaction,
     InventoryTransactionType,
@@ -20,7 +25,11 @@ async def create_vehicle(session: AsyncSession, vehicle_data: VehicleCreateReque
     """Persist one administrator-supplied inventory vehicle."""
     vehicle = Vehicle(**vehicle_data.model_dump())
     session.add(vehicle)
-    await session.commit()
+    try:
+        await session.commit()
+    except IntegrityError as error:
+        await session.rollback()
+        raise VehicleVinAlreadyExistsError from error
     await session.refresh(vehicle)
     return vehicle
 
@@ -63,7 +72,11 @@ async def update_vehicle(
     """Replace editable vehicle attributes with administrator-supplied values."""
     for field_name, value in vehicle_data.model_dump().items():
         setattr(vehicle, field_name, value)
-    await session.commit()
+    try:
+        await session.commit()
+    except IntegrityError as error:
+        await session.rollback()
+        raise VehicleVinAlreadyExistsError from error
     await session.refresh(vehicle)
     return vehicle
 
